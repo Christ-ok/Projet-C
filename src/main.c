@@ -5,6 +5,7 @@
 
 #include "background.h"
 #include "animation.h"
+#include "deplacement.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -32,6 +33,9 @@ int main(int argc, char *argv[])
 
     SDL_bool running = SDL_TRUE;
     int state = 0; // 0 = idle, 1 = run, 2 = attack
+    int background_x = 0;
+    int d_pressed = 0;
+    const int speed = 5;
 
     while (running)
     {
@@ -40,21 +44,35 @@ int main(int argc, char *argv[])
         {
             if (event.type == SDL_QUIT)
                 running = SDL_FALSE;
+
             if (event.type == SDL_KEYDOWN)
             {
-                if (event.key.keysym.sym == SDLK_d)
+                if (event.key.keysym.sym == SDLK_d){
+                    d_pressed = 1;
                     state = 1;
+                }
+
                 if (event.key.keysym.sym == SDLK_k)
                     state = 2;
             }
-            if (event.type == SDL_KEYUP)
-            {
-                state = 0;
+
+            if (event.type == SDL_KEYUP){
+                if (event.key.keysym.sym == SDLK_d){
+                    d_pressed = 0;
+                    state = 0;
+                } else if (event.key.keysym.sym == SDLK_k){
+                    state = 0;
+                }
             }
         }
 
+        if(d_pressed){
+            background_x -= speed;
+        }
+
+
         SDL_RenderClear(renderer);
-        drawBackground(renderer);
+        drawBackground(renderer, background_x);
         drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state);
         SDL_RenderPresent(renderer);
         SDL_Delay(16); // ~60 FPS
@@ -70,3 +88,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+//Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
