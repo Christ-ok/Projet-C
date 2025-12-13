@@ -50,11 +50,12 @@ Menu menu_create(SDL_Renderer *renderer, TTF_Font *font, const char **labels, in
     m.items = malloc(sizeof(SDL_Texture *) * count);
     m.rects = malloc(sizeof(SDL_Rect) * count);
 
-    SDL_Color green = {50, 255, 180, 255};
+    SDL_Color black = {255, 255, 255, 255};
+    
     for (int i = 0; i < count; i++)
     {
         int w, h;
-        m.items[i] = create_text(renderer, font, labels[i], green, &w, &h);
+        m.items[i] = create_text(renderer, font, labels[i], black, &w, &h);
         m.rects[i] = (SDL_Rect){0, 0, w, h};
     }
     return m;
@@ -93,17 +94,27 @@ void menu_render(SDL_Renderer *renderer, Menu *m)
 {
     for (int i = 0; i < m->count; i++)
     {
+        SDL_Rect r = m->rects[i];
         if (i == m->selected)
         {
-            SDL_SetRenderDrawColor(renderer, 0, 255, 170, 70);
-            SDL_Rect r = m->rects[i];
-            r.x -= 12;
-            r.y -= 8;
-            r.w += 24;
-            r.h += 16;
-            SDL_RenderFillRect(renderer, &r);
+            r.x += r.w * 0.05;
+            r.y += r.h * 0.05;
+            r.w *= 0.9;
+            r.h *= 0.9;
         }
-        SDL_RenderCopy(renderer, m->items[i], NULL, &m->rects[i]);
+
+        SDL_SetTextureColorMod(m->items[i], 0, 0, 0);
+        SDL_SetTextureAlphaMod(m->items[i], 100);
+        SDL_Rect shadow = {r.x + 3, r.y + 3, r.w, r.h};
+        SDL_RenderCopy(renderer, m->items[i], NULL, &shadow);
+
+        if (i == m->selected)
+            SDL_SetTextureColorMod(m->items[i], 0, 0, 0);
+        else
+            SDL_SetTextureColorMod(m->items[i], 255, 255, 255);
+
+        SDL_SetTextureAlphaMod(m->items[i], 255);
+        SDL_RenderCopy(renderer, m->items[i], NULL, &r);
     }
 }
 
@@ -144,10 +155,8 @@ int main()
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     TTF_Init();
     IMG_Init(IMG_INIT_PNG);
-
     int vol, winW, winH;
     load_config(&vol, &winW, &winH);
-
     Mix_Init(MIX_INIT_OGG);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 
@@ -165,10 +174,10 @@ int main()
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    TTF_Font *font = TTF_OpenFont("..\\Projet-C\\assets\\fonts\\Titre_menu.ttf", 64);
+    TTF_Font *font = TTF_OpenFont("..\\Projet-C\\assets\\fonts\\police_menu2.ttf", 64);
     SDL_Texture *bg = IMG_LoadTexture(renderer, "..\\Projet-C\\assets\\background\\image_fondv1.png");
 
-    // DEBUG: afficher la taille réelle de la texture chargée
+    
     if (bg)
     {
         int tw = 0, th = 0;
@@ -194,7 +203,7 @@ int main()
     MenuState state = MENU_MAIN;
     Menu currentMenu = mainMenu;
 
-    int preset[4][2] = {{1280, 720}, {1600, 900}, {1920, 1080}, {800, 600}};
+    int preset[4][2] = {{800, 600},{1280, 720}, {1600, 900}, {1920, 1080}};
 
     int running = 1;
     SDL_Event e;
@@ -263,6 +272,7 @@ int main()
                     if (s < 4)
                     {
                         SDL_SetWindowSize(window, preset[s][0], preset[s][1]);
+                        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);//la fenetre est centrer comme ca arnaud sera content avec son cul plein de merde
                         save_config(vol, preset[s][0], preset[s][1]);
                     }
                     else
@@ -293,7 +303,7 @@ int main()
 
                 int w, h;
                 audioMenu.items[0] = create_text(renderer, font, volText,
-                                                 (SDL_Color){50, 255, 180, 255}, &w, &h);
+                                                 (SDL_Color){50, 0, 0, 0}, &w, &h);
                 audioMenu.rects[0].w = w;
                 audioMenu.rects[0].h = h;
 
