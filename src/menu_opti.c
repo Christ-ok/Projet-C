@@ -5,28 +5,12 @@
 #include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "menu_opti.h"
 
 #define DEFAULT_WIDTH 1280
 #define DEFAULT_HEIGHT 720
 
 static const char CONFIG_PATH[] = "..\\Projet-C\\config.ini";
-
-typedef struct
-{
-    SDL_Texture **items;
-    SDL_Rect *rects;
-    int count;
-    int selected;
-} Menu;
-
-typedef enum
-{
-    MENU_MAIN,
-    MENU_JOUER,
-    MENU_PARAM,
-    MENU_AUDIO,
-    MENU_RESOL
-} MenuState;
 
 SDL_Texture *create_text(SDL_Renderer *r, TTF_Font *f, const char *txt, SDL_Color c, int *ow, int *oh)
 {
