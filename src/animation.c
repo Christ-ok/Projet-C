@@ -29,19 +29,24 @@ void initCharacter(SDL_Renderer *renderer)
         SDL_Log("Erreur chargement textures personnage");
 }
 
-void drawCharacter(SDL_Renderer *renderer, int x, int y, int state)
+void drawCharacter(SDL_Renderer *renderer, int x, int y, int state, int gauche)
 {
+
+    SDL_RendererFlip flip = gauche ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+
     Uint32 now = SDL_GetTicks();
 
     if (!locked)
     {
         if (state != currentState)
         {
-            currentState = state;
             currentFrame = 0;
+            currentState = state;
 
             if (state == 2 || state == 3 || state == 4)
+            {
                 locked = 1;
+            }
         }
     }
 
@@ -82,14 +87,18 @@ void drawCharacter(SDL_Renderer *renderer, int x, int y, int state)
         if (locked)
         {
             locked = 0;
-            currentState = 0;
+
+            if (currentState != 1)
+            {
+                currentState = 0;
+            }
         }
     }
 
     SDL_Rect src = {currentFrame * frameWidth, 0, frameWidth, frameHeight};
     SDL_Rect dst = {x - frameWidth * 2, y - frameHeight * 2, frameWidth * 4, frameHeight * 4};
 
-    SDL_RenderCopy(renderer, Animation, &src, &dst);
+    SDL_RenderCopyEx(renderer, Animation, &src, &dst, 0, NULL, flip);
 }
 
 void cleanupCharacter()

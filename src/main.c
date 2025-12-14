@@ -26,12 +26,12 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("BLADE QUEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Initialisation modules
     initBackground(renderer);
     initCharacter(renderer);
 
     SDL_bool running = SDL_TRUE;
-    int state = 0; // 0 = idle, 1 = run, 2 = attack
+    int state = 0;
+    int gauche = 0;
 
     while (running)
     {
@@ -43,14 +43,29 @@ int main(int argc, char *argv[])
             if (event.type == SDL_KEYDOWN)
             {
                 if (event.key.keysym.sym == SDLK_d)
+                {
                     state = 1;
+                    gauche = 0;
+                }
+                else if (event.key.keysym.sym == SDLK_q)
+                {
+                    state = 1;
+                    gauche = 1;
+                }
                 if (event.key.keysym.sym == SDLK_k)
+                {
                     state = 2;
+                }
                 if (event.key.keysym.sym == SDLK_SPACE)
+                {
                     state = 3;
+                }
                 if (event.key.keysym.sym == SDLK_t)
+                {
                     state = 4;
+                }
             }
+
             if (event.type == SDL_KEYUP)
             {
                 state = 0;
@@ -59,12 +74,11 @@ int main(int argc, char *argv[])
 
         SDL_RenderClear(renderer);
         drawBackground(renderer);
-        drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state);
+        drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state, gauche);
         SDL_RenderPresent(renderer);
-        SDL_Delay(16); // ~60 FPS
+        SDL_Delay(16);
     }
 
-    // Nettoyage
     cleanupBackground();
     cleanupCharacter();
     SDL_DestroyRenderer(renderer);
