@@ -46,6 +46,10 @@ int main(int argc, char *argv[])
                     state = 1;
                 if (event.key.keysym.sym == SDLK_k)
                     state = 2;
+                if (event.key.keysym.sym == SDLK_SPACE)
+                    state = 3;
+                if (event.key.keysym.sym == SDLK_t)
+                    state = 4;
             }
             if (event.type == SDL_KEYUP)
             {
