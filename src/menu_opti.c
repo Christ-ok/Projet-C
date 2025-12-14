@@ -172,12 +172,12 @@ int main()
     const char *mainItems[] = {"JOUER", "PARAMETRES", "QUITTER"};
     const char *jouerItems[] = {"NOUVELLE PARTIE", "CHARGER PARTIE", "RETOUR"};
     const char *paramItems[] = {"AUDIO", "RESOLUTION", "RETOUR"};
-    const char *resItems[] = {"1280x720", "1600x900", "1920x1080", "800x600", "RETOUR"};
+    const char *resItems[] = {"1280x720", "1600x900", "1920x1080", "800x600", "PLEIN ECRAN", "RETOUR"};
 
     Menu mainMenu = menu_create(renderer, font, mainItems, 3);
     Menu jouerMenu = menu_create(renderer, font, jouerItems, 3);
     Menu paramMenu = menu_create(renderer, font, paramItems, 3);
-    Menu resMenu = menu_create(renderer, font, resItems, 5);
+    Menu resMenu = menu_create(renderer, font, resItems, 6);
 
     char volText[64];
     sprintf(volText, "VOLUME : %d%%", vol);
@@ -187,7 +187,7 @@ int main()
     MenuState state = MENU_MAIN;
     Menu currentMenu = mainMenu;
 
-    int preset[4][2] = {{800, 600},{1280, 720}, {1600, 900}, {1920, 1080}};
+    int preset[4][2] = {{1280, 720}, {1600, 900}, {1920, 1080}, {800, 600}};
 
     int running = 1;
     SDL_Event e;
@@ -255,9 +255,17 @@ int main()
                 {
                     if (s < 4)
                     {
+                        SDL_SetWindowFullscreen(window, 0);
                         SDL_SetWindowSize(window, preset[s][0], preset[s][1]);
                         SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);//la fenetre est centrer comme ca arnaud sera content avec son cul plein de merde
                         save_config(vol, preset[s][0], preset[s][1]);
+                    }
+                    else if (s == 4)
+                    {
+                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        int w, h;
+                        SDL_GetWindowSize(window, &w, &h);
+                        save_config(vol, w, h);
                     }
                     else
                     {
