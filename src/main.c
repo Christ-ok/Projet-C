@@ -72,20 +72,27 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (event.type == SDL_KEYUP){
-                if (event.key.keysym.sym == SDLK_d){
+            if (event.type == SDL_KEYUP)
+            {
+
+                state = 0;
+
+                if (event.key.keysym.sym == SDLK_d)
+                {
                     d_pressed = 0;
                     state = 0;
-                } else if (event.key.keysym.sym == SDLK_k){
+                }
+                else if (event.key.keysym.sym == SDLK_k)
+                {
                     state = 0;
                 }
             }
         }
 
-        if(d_pressed){
+        if (d_pressed)
+        {
             background_x -= speed;
         }
-
 
         SDL_RenderClear(renderer);
         drawBackground(renderer, background_x);
@@ -104,4 +111,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-//Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
+// Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
