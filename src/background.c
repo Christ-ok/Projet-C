@@ -10,19 +10,23 @@ void initBackground(SDL_Renderer *renderer){
         SDL_Log("Erreur chargement background: %s", IMG_GetError());
 }
 
-void drawBackground(SDL_Renderer *renderer, int x){
+SDL_Texture *getBackgroundTExture(SDL_Renderer *renderer){
+    return textureBackground;
+}
+
+
+void drawBackground(SDL_Renderer *renderer, int x, int y){
     if (!textureBackground){
         return;
     }
 
-    SDL_Rect dst;
-    dst.x = x;
-    dst.y = 0;
-    dst.w = 800;
-    dst.h = 600;
+    SDL_Rect dst1 = {x, y, 800, 600};
+    SDL_Rect dst2 = {x + 800, y, 800, 600};
 
-    SDL_RenderCopy(renderer, textureBackground, NULL, &dst);
+    SDL_RenderCopy(renderer, textureBackground, NULL, &dst1);
+    SDL_RenderCopy(renderer, textureBackground, NULL, &dst2);
 }
+
 
 void cleanupBackground(){
     if (textureBackground)

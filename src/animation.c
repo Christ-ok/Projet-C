@@ -96,7 +96,7 @@ void drawCharacter(SDL_Renderer *renderer, int x, int y, int state, int gauche)
     }
 
     SDL_Rect src = {currentFrame * frameWidth, 0, frameWidth, frameHeight};
-    SDL_Rect dst = {x - frameWidth * 2, y - frameHeight * 2, frameWidth * 4, frameHeight * 4};
+    SDL_Rect dst = {x - frameWidth * 4, y - frameHeight / 6, frameWidth * 4, frameHeight * 4};
 
     SDL_RenderCopyEx(renderer, Animation, &src, &dst, 0, NULL, flip);
 }
