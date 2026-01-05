@@ -6,13 +6,15 @@
 #include "background.h"
 #include "animation.h"
 #include "deplacement.h"
+//
+#include "demon.h"
 
 #define WIDTH 800
 #define HEIGHT 600
 
 int main(int argc, char *argv[])
 {
-    // Initialisation SDL et SDL_image
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         SDL_Log("SDL_Init: %s", SDL_GetError());
@@ -29,13 +31,16 @@ int main(int argc, char *argv[])
 
     initBackground(renderer);
     initCharacter(renderer);
+    //
+    initDemon(renderer);
 
     SDL_bool running = SDL_TRUE;
     int gauche = 0;
-    int state = 0; // 0 = idle, 1 = run, 2 = attack
+    int state = 0;
     int background_x = 0;
     int d_pressed = 0;
     const int speed = 5;
+    int PlayerIsLeft = 0;
 
     while (running)
     {
@@ -61,6 +66,8 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_k)
                 {
                     state = 2;
+                    //
+                    Demon_takeDamage(1);
                 }
                 if (event.key.keysym.sym == SDLK_SPACE)
                 {
@@ -69,6 +76,11 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_t)
                 {
                     state = 4;
+                }
+                //
+                if (event.key.keysym.sym == SDLK_j)
+                {
+                    state = 5;
                 }
             }
 
@@ -97,12 +109,16 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
         drawBackground(renderer, background_x);
         drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state, gauche);
+        //
+        drawDemon(renderer, WIDTH / 2, HEIGHT / 2, state, PlayerIsLeft);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
 
     cleanupBackground();
     cleanupCharacter();
+    //
+    cleanupDemon();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
@@ -112,3 +128,4 @@ int main(int argc, char *argv[])
 }
 
 // Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
+// gcc src/animation.c src/deplacement.c src/background.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
