@@ -10,15 +10,12 @@
 #include "demon.h"
 #include "deplacement2.h"
 
-
-
 #define WIDTH 800
 #define HEIGHT 600
 
 int main(int argc, char *argv[])
 {
 
-    
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         SDL_Log("SDL_Init: %s", SDL_GetError());
@@ -37,10 +34,9 @@ int main(int argc, char *argv[])
     initDemon(renderer);
     initBackground(renderer);
 
-
     SDL_bool running = SDL_TRUE;
     int gauche = 0;
-    int state = 0; 
+    int state = 0;
     int scroll = 0;
     int background_x = 0;
     int background_y = 0;
@@ -56,6 +52,14 @@ int main(int argc, char *argv[])
     const int speed = 5;
     int PlayerIsLeft = 0;
 
+    struct Ennemie
+    {
+        int x_Ennemie;
+        int y_Ennemie;
+    };
+
+    struct Ennemie Demon = {700, 400};
+
     while (running)
     {
         SDL_Event event;
@@ -70,14 +74,14 @@ int main(int argc, char *argv[])
                 {
                     d_pressed = 1;
                     state = 1;
-                    gauche = 0;                    
+                    gauche = 0;
                 }
-                
-                if(event.key.keysym.sym == SDLK_q)
+
+                if (event.key.keysym.sym == SDLK_q)
                 {
                     q_pressed = 1;
                     state = 1;
-                    gauche = 1; 
+                    gauche = 1;
                 }
 
                 if (event.key.keysym.sym == SDLK_k)
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
                     state = 0;
                 }
 
-                if(event.key.keysym.sym == SDLK_k)
+                if (event.key.keysym.sym == SDLK_k)
                 {
                     state = 0;
                 }
@@ -140,20 +144,24 @@ int main(int argc, char *argv[])
         if (d_pressed)
         {
             background_x -= speed;
+            Demon.x_Ennemie -= speed;
         }
-        
-        if (q_pressed){
+
+        if (q_pressed)
+        {
             background_x += speed;
+            Demon.x_Ennemie += speed;
         }
 
-        if (background_x <= -800){
+        if (background_x <= -800)
+        {
             background_x = 0;
         }
 
-        if (background_x >= 0){
+        if (background_x >= 0)
+        {
             background_x = 0;
         }
-       
 
         if (space_pressed && jump_direction == 0)
         {
@@ -163,27 +171,30 @@ int main(int argc, char *argv[])
         if (jump_direction == 1)
         {
             jump_offset += jump_speed;
+            Demon.y_Ennemie += jump_speed;
             if (jump_offset >= jump_height)
             {
                 jump_offset = jump_height;
                 jump_direction = -1;
             }
-        } else if (jump_direction == -1)
+        }
+        else if (jump_direction == -1)
         {
             jump_offset -= jump_speed;
+            Demon.y_Ennemie -= jump_speed;
             if (jump_offset <= 0)
             {
                 jump_offset = 0;
+                Demon.y_Ennemie = 380;
                 jump_direction = 0;
             }
-        }    
-        
-        
+        }
+
         SDL_RenderClear(renderer);
         drawBackground(renderer, background_x, jump_offset);
         drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state, gauche);
         //
-        drawDemon(renderer, WIDTH / 2, HEIGHT / 2, state, PlayerIsLeft);
+        drawDemon(renderer, Demon.x_Ennemie, Demon.y_Ennemie, state, PlayerIsLeft);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }

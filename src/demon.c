@@ -2,6 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 
+#define d_SPEED 5
+
 SDL_Texture *idleDemon = NULL;
 SDL_Texture *attackDemon = NULL;
 SDL_Texture *HurtDemon = NULL;
@@ -124,7 +126,7 @@ void drawDemon(SDL_Renderer *renderer, int x, int y, int state, int PlayerIsLeft
     }
 
     SDL_Rect Demon_src = {Demon_currentFrame * Demon_frameWidth, 0, Demon_frameWidth, Demon_frameHeight};
-    SDL_Rect Demon_dst = {x - Demon_frameWidth * -2, y - Demon_frameHeight * 1, Demon_frameWidth * 2, Demon_frameHeight * 2};
+    SDL_Rect Demon_dst = {x, y, Demon_frameWidth * 1.75, Demon_frameHeight * 1.75};
 
     SDL_RenderCopyEx(renderer, Demon_Animation, &Demon_src, &Demon_dst, 0, NULL, Demon_flip);
 }
