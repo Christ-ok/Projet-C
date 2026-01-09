@@ -6,25 +6,19 @@
 #include "background.h"
 #include "animation.h"
 #include "deplacement.h"
-<<<<<<< HEAD
 //
 #include "demon.h"
-=======
 #include "deplacement2.h"
 
 
->>>>>>> deplacementBrackgroundFinal
 
 #define WIDTH 800
 #define HEIGHT 600
 
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
 
-=======
     
->>>>>>> deplacementBrackgroundFinal
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         SDL_Log("SDL_Init: %s", SDL_GetError());
@@ -40,22 +34,14 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     initCharacter(renderer);
-<<<<<<< HEAD
-    //
     initDemon(renderer);
+    initBackground(renderer);
 
-    SDL_bool running = SDL_TRUE;
-    int gauche = 0;
-    int state = 0;
-=======
-    initBackground(renderer);
-    initBackground(renderer);
 
     SDL_bool running = SDL_TRUE;
     int gauche = 0;
     int state = 0; 
     int scroll = 0;
->>>>>>> deplacementBrackgroundFinal
     int background_x = 0;
     int background_y = 0;
 
@@ -112,15 +98,11 @@ int main(int argc, char *argv[])
                 {
                     state = 4;
                 }
-<<<<<<< HEAD
                 //
                 if (event.key.keysym.sym == SDLK_j)
                 {
                     state = 5;
                 }
-=======
-
->>>>>>> deplacementBrackgroundFinal
             }
 
             if (event.type == SDL_KEYUP)
@@ -218,8 +200,5 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-<<<<<<< HEAD
 // Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
-// gcc src/animation.c src/deplacement.c src/background.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
-=======
->>>>>>> deplacementBrackgroundFinal
+// gcc src/animation.c src/deplacement.c src/background.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o proj
