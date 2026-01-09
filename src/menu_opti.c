@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "menu_opti.h"
+#include "background.h"
+#include "animation.h"
 
 #define DEFAULT_WIDTH 1280
 #define DEFAULT_HEIGHT 720
@@ -102,20 +104,21 @@ void menu_render(SDL_Renderer *renderer, Menu *m)
     }
 }
 
-void save_config(int vol, int w, int h)
+void save_config(int vol, int w, int h, int fs)
 {
     FILE *f = fopen(CONFIG_PATH, "w");
     if (!f)
         return;
-    fprintf(f, "volume=%d\nwidth=%d\nheight=%d\n", vol, w, h);
+    fprintf(f, "volume=%d\nwidth=%d\nheight=%d\nfullscreen=%d\n", vol, w, h, fs);
     fclose(f);
 }
 
-void load_config(int *vol, int *w, int *h)
+void load_config(int *vol, int *w, int *h, int *fs)
 {
     *vol = 33;
     *w = DEFAULT_WIDTH;
     *h = DEFAULT_HEIGHT;
+    *fs = 0;
 
     FILE *f = fopen(CONFIG_PATH, "r");
     if (!f)
@@ -130,8 +133,71 @@ void load_config(int *vol, int *w, int *h)
             *w = atoi(val);
         else if (strcmp(key, "height") == 0)
             *h = atoi(val);
+        else if (strcmp(key, "fullscreen") == 0)
+            *fs = atoi(val);
     }
     fclose(f);
+}
+
+int play_game(SDL_Window *window, SDL_Renderer *renderer)
+{
+    initBackground(renderer);
+    initCharacter(renderer);
+
+    int running = 1;
+    int quit_app = 0;
+    int state = 0;
+    int gauche = 0;
+
+    while (running)
+    {
+        int winW, winH;
+        SDL_GetWindowSize(window, &winW, &winH);
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                running = 0;
+                quit_app = 1;
+            }
+            if (event.type == SDL_KEYDOWN)
+            {
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                    running = 0;
+                
+                if (event.key.keysym.sym == SDLK_d)
+                {
+                    state = 1;
+                    gauche = 0;
+                }
+                else if (event.key.keysym.sym == SDLK_q)
+                {
+                    state = 1;
+                    gauche = 1;
+                }
+                if (event.key.keysym.sym == SDLK_k)
+                    state = 2;
+                if (event.key.keysym.sym == SDLK_SPACE)
+                    state = 3;
+                if (event.key.keysym.sym == SDLK_t)
+                    state = 4;
+            }
+
+            if (event.type == SDL_KEYUP)
+                state = 0;
+        }
+
+        SDL_RenderClear(renderer);
+        drawBackground(renderer);
+        drawCharacter(renderer, winW / 2, winH / 2, state, gauche);
+        SDL_RenderPresent(renderer);
+    }
+
+    cleanupBackground();
+    cleanupCharacter();
+    return quit_app;
 }
 
 int main()
@@ -139,8 +205,8 @@ int main()
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     TTF_Init();
     IMG_Init(IMG_INIT_PNG);
-    int vol, winW, winH;
-    load_config(&vol, &winW, &winH);
+    int vol, winW, winH, isFullscreen;
+    load_config(&vol, &winW, &winH, &isFullscreen);
     Mix_Init(MIX_INIT_OGG);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 
@@ -153,7 +219,7 @@ int main()
 
     SDL_Window *window = SDL_CreateWindow("Blade Quest",
                                           SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          winW, winH, SDL_WINDOW_RESIZABLE);
+                                          winW, winH, SDL_WINDOW_RESIZABLE | (isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -166,13 +232,16 @@ int main()
     {
         int tw = 0, th = 0;
         SDL_QueryTexture(bg, NULL, NULL, &tw, &th);
-        printf("DEBUG: bg texture size = %d x %d\n", tw, th);
+        printf("Résolution apres fermeture = %d x %d\n", tw, th);
     }
 
     const char *mainItems[] = {"JOUER", "PARAMETRES", "QUITTER"};
     const char *jouerItems[] = {"NOUVELLE PARTIE", "CHARGER PARTIE", "RETOUR"};
     const char *paramItems[] = {"AUDIO", "RESOLUTION", "RETOUR"};
-    const char *resItems[] = {"1280x720", "1600x900", "1920x1080", "800x600", "PLEIN ECRAN", "RETOUR"};
+    
+    char fsText[64];
+    sprintf(fsText, "PLEIN ECRAN : %s", isFullscreen ? "ON" : "OFF");
+    const char *resItems[] = {"800x600","1280x720", "1600x900", "1920x1080", fsText, "RETOUR"};
 
     Menu mainMenu = menu_create(renderer, font, mainItems, 3);
     Menu jouerMenu = menu_create(renderer, font, jouerItems, 3);
@@ -187,7 +256,7 @@ int main()
     MenuState state = MENU_MAIN;
     Menu currentMenu = mainMenu;
 
-    int preset[4][2] = {{1280, 720}, {1600, 900}, {1920, 1080}, {800, 600}};
+    int preset[4][2] = {{800, 600},{1280, 720}, {1600, 900}, {1920, 1080}};
 
     int running = 1;
     SDL_Event e;
@@ -231,6 +300,11 @@ int main()
                     state = MENU_MAIN;
                     currentMenu = mainMenu;
                 }
+                else if (state == MENU_JOUER && s == 0)
+                {
+                    if (play_game(window, renderer))
+                        running = 0;
+                }
 
                 else if (state == MENU_PARAM)
                 {
@@ -255,17 +329,26 @@ int main()
                 {
                     if (s < 4)
                     {
+                        isFullscreen = 0;
                         SDL_SetWindowFullscreen(window, 0);
                         SDL_SetWindowSize(window, preset[s][0], preset[s][1]);
-                        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);//la fenetre est centrer comme ca arnaud sera content avec son cul plein de merde
-                        save_config(vol, preset[s][0], preset[s][1]);
+                        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+                        save_config(vol, preset[s][0], preset[s][1], isFullscreen);
                     }
                     else if (s == 4)
                     {
-                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+                        isFullscreen = !isFullscreen;
+                        SDL_SetWindowFullscreen(window, isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                        
+                        SDL_GetWindowSize(window, &winW, &winH);
+                        save_config(vol, winW, winH, isFullscreen);
+
+                        sprintf(fsText, "PLEIN ECRAN : %s", isFullscreen ? "ON" : "OFF");
+                        SDL_DestroyTexture(resMenu.items[4]);
                         int w, h;
-                        SDL_GetWindowSize(window, &w, &h);
-                        save_config(vol, w, h);
+                        resMenu.items[4] = create_text(renderer, font, fsText, (SDL_Color){255, 255, 255, 255}, &w, &h);
+                        resMenu.rects[4].w = w;
+                        resMenu.rects[4].h = h;
                     }
                     else
                     {
@@ -299,7 +382,7 @@ int main()
                 audioMenu.rects[0].w = w;
                 audioMenu.rects[0].h = h;
 
-                save_config(vol, winW, winH);
+                save_config(vol, winW, winH, isFullscreen);
             }
         }
 

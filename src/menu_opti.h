@@ -27,7 +27,7 @@ void menu_free(Menu *m);
 void menu_layout(Menu *m, int winW, int winH, int startY);
 void menu_handle_mouse(Menu *m, int mx, int my);
 void menu_render(SDL_Renderer *renderer, Menu *m);
-void save_config(int vol, int w, int h);
-void load_config(int *vol, int *w, int *h);
+void save_config(int vol, int w, int h, int fs);
+void load_config(int *vol, int *w, int *h, int *fs);
 
 #endif
