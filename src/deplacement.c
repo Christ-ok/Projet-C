@@ -1,3 +1,5 @@
+/*
+
 #include "deplacement.h"
 #include "background.h"
 #include <SDL2/SDL_image.h>
@@ -27,6 +29,6 @@ void deplacerJoueur(int *background_x, int d_pressed, int q_pressed)
         *background_x = 0;
     }
     
-
-
 }
+*/
+

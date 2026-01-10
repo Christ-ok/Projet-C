@@ -5,13 +5,15 @@
 
 #include "background.h"
 #include "animation.h"
-#include "deplacement.h"
+#include "blocs.h"
 #include "deplacement2.h"
 
 Personnage perso;
 
+
 #define WIDTH 800
 #define HEIGHT 600
+#define NB_BLOCS 10
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +35,16 @@ int main(int argc, char *argv[])
     initCharacter(renderer, &perso);
     initBackground(renderer);
 
+    Bloc surface;
+    initBloc(renderer, &surface);
+
+    
+    Bloc tab[NB_BLOCS];
+    initBlocArray(tab, NB_BLOCS, surface.w, surface.h);
+
+    Bloc level[200];
+    generateLevel(level, 200, surface.w, surface.h);
+
     SDL_bool running = SDL_TRUE; 
     int camera_x = 0;
     int camera_y = 0;
@@ -43,19 +55,21 @@ int main(int argc, char *argv[])
 
     int jump_offset = 0;
     int jump_direction = 0;
-    const int jump_height = 120;
-    const int jump_speed = 4;
-
+    const int jump_height = 160;
+    const int jump_speed = 7;
+    
     const int speed = 5;
 
+    
+    
     while (running)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                running = SDL_FALSE;
-
+            running = SDL_FALSE;
+            
             if (event.type == SDL_KEYDOWN)
             {
                 if (event.key.keysym.sym == SDLK_d)
@@ -120,6 +134,8 @@ int main(int argc, char *argv[])
                     perso.state = 0;
                 }
             }
+
+            
         }
 
         updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
@@ -133,7 +149,8 @@ int main(int argc, char *argv[])
         cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
         
         SDL_RenderClear(renderer);
-        drawBackground(renderer, camera_x, camera_y);
+        drawBackground(renderer, camera_x, camera_y);        
+        drawBloc(renderer, level, 200, camera_x);
         drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
