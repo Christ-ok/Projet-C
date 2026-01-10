@@ -2,14 +2,31 @@
 #include "background.h"
 #include <SDL2/SDL_image.h>
 
-void deplacerJoueur(int *background_x, SDL_Event event)
+
+const int frameWidth2 = 96;
+const int frameHeight2 = 84;
+const int speed = 15;
+
+
+void deplacerJoueur(int *background_x, int d_pressed, int q_pressed)
 {
-    if (event.type == SDL_KEYDOWN)
+    if (d_pressed)
     {
-        if (event.key.keysym.sym == SDLK_d)
-        {
-            *background_x -= 5;
-        }
+        *background_x -= speed;
     }
+        
+    if (q_pressed){
+        *background_x += speed;
+    }
+    
+    if (*background_x <= -800){
+        *background_x = 0;
+    }
+ 
+    if (*background_x >= 0){
+        *background_x = 0;
+    }
+    
+
 
 }

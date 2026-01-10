@@ -3,8 +3,20 @@
 
 #include <SDL2/SDL.h>
 
-void initCharacter(SDL_Renderer *renderer);
-void drawCharacter(SDL_Renderer *renderer, int x, int y, int state, int gauche);
+typedef struct{
+    int x;
+    int y;
+    int base_y;
+    int w;
+    int h;
+    int speed;
+    int state;
+    int direction;
+}Personnage;
+
+void initCharacter(SDL_Renderer *renderer, Personnage *p);
+void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset);
+void updateCharacter(Personnage *p, int d_pressed, int q_pressed, int space_pressed, int camera_x);
 void cleanupCharacter();
 
 #endif

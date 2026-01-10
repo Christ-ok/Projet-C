@@ -8,7 +8,7 @@
 #include "deplacement.h"
 #include "deplacement2.h"
 
-
+Personnage perso;
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -30,16 +30,12 @@ int main(int argc, char *argv[])
     SDL_Window *window = SDL_CreateWindow("BLADE QUEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    initCharacter(renderer);
-    initBackground(renderer);
+    initCharacter(renderer, &perso);
     initBackground(renderer);
 
-    SDL_bool running = SDL_TRUE;
-    int gauche = 0;
-    int state = 0; 
-    int scroll = 0;
-    int background_x = 0;
-    int background_y = 0;
+    SDL_bool running = SDL_TRUE; 
+    int camera_x = 0;
+    int camera_y = 0;
 
     int d_pressed = 0;
     int q_pressed = 0;
@@ -49,6 +45,7 @@ int main(int argc, char *argv[])
     int jump_direction = 0;
     const int jump_height = 120;
     const int jump_speed = 4;
+
     const int speed = 5;
 
     while (running)
@@ -64,34 +61,33 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_d)
                 {
                     d_pressed = 1;
-                    state = 1;
-                    gauche = 0;                    
+                    perso.state = 1;
+                    perso.direction = 0;                 
                 }
                 
                 if(event.key.keysym.sym == SDLK_q)
                 {
                     q_pressed = 1;
-                    state = 1;
-                    gauche = 1; 
+                    perso.state = 1;
+                    perso.direction = 1; 
                 }
 
                 if (event.key.keysym.sym == SDLK_k)
                 {
-                    state = 2;
+                    perso.state = 2;
                 }
 
                 if (event.key.keysym.sym == SDLK_SPACE)
                 {
                     space_pressed = 1;
-                    state = 3;
+                    perso.state = 3;
                     jump_direction = 1;
                 }
 
                 if (event.key.keysym.sym == SDLK_t)
                 {
-                    state = 4;
+                    perso.state = 4;
                 }
-
             }
 
             if (event.type == SDL_KEYUP)
@@ -99,78 +95,46 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_d)
                 {
                     d_pressed = 0;
-                    state = 0;
+                    perso.state = 0;
                 }
 
                 if(event.key.keysym.sym == SDLK_k)
                 {
-                    state = 0;
+                    perso.state = 0;
                 }
 
                 if (event.key.keysym.sym == SDLK_q)
                 {
-                    state = 0;
+                    perso.state = 0;
                     q_pressed = 0;
                 }
 
                 if (event.key.keysym.sym == SDLK_SPACE)
                 {
-                    state = 0;
+                    perso.state = 0;
                     space_pressed = 0;
                 }
 
                 if (event.key.keysym.sym == SDLK_t)
                 {
-                    state = 0;
+                    perso.state = 0;
                 }
             }
         }
 
-        if (d_pressed)
+        updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
+
+        jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed);
+        if (jump_direction == 0 && jump_offset == 0 && perso.state == 3)
         {
-            background_x -= speed;
-        }
-        
-        if (q_pressed){
-            background_x += speed;
+            perso.state = 0;
         }
 
-        if (background_x <= -800){
-            background_x = 0;
-        }
-
-        if (background_x >= 0){
-            background_x = 0;
-        }
-       
-
-        if (space_pressed && jump_direction == 0)
-        {
-            jump_direction = 1;
-        }
-
-        if (jump_direction == 1)
-        {
-            jump_offset += jump_speed;
-            if (jump_offset >= jump_height)
-            {
-                jump_offset = jump_height;
-                jump_direction = -1;
-            }
-        } else if (jump_direction == -1)
-        {
-            jump_offset -= jump_speed;
-            if (jump_offset <= 0)
-            {
-                jump_offset = 0;
-                jump_direction = 0;
-            }
-        }    
-        
+        cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
         
         SDL_RenderClear(renderer);
-        drawBackground(renderer, background_x, jump_offset);
-        drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state, gauche);
+        drawBackground(renderer, camera_x, camera_y);
+        drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
