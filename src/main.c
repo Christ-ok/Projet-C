@@ -6,12 +6,12 @@
 #include "background.h"
 #include "animation.h"
 #include "deplacement.h"
-//
 #include "demon.h"
 #include "deplacement2.h"
 
 #define WIDTH 800
 #define HEIGHT 600
+#define MAX_DEMONS 2
 
 int main(int argc, char *argv[])
 {
@@ -52,13 +52,9 @@ int main(int argc, char *argv[])
     const int speed = 5;
     int PlayerIsLeft = 0;
 
-    struct Ennemie
-    {
-        int x_Ennemie;
-        int y_Ennemie;
-    };
-
-    struct Ennemie Demon = {700, 400};
+    Demon horde[MAX_DEMONS];
+    Demon_spawn(&horde[0], 700, 400);
+    Demon_spawn(&horde[1], 300, 200);
 
     while (running)
     {
@@ -87,8 +83,10 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_k)
                 {
                     state = 2;
-                    //
-                    Demon_takeDamage(1);
+                    for (int i = 0; i < MAX_DEMONS; i++)
+                    {
+                        Demon_takeDamage(&horde[1], 1);
+                    }
                 }
 
                 if (event.key.keysym.sym == SDLK_SPACE)
@@ -102,7 +100,6 @@ int main(int argc, char *argv[])
                 {
                     state = 4;
                 }
-                //
                 if (event.key.keysym.sym == SDLK_j)
                 {
                     state = 5;
@@ -144,13 +141,19 @@ int main(int argc, char *argv[])
         if (d_pressed)
         {
             background_x -= speed;
-            Demon.x_Ennemie -= speed;
+            for (int i = 0; i < MAX_DEMONS; i++)
+            {
+                horde[i].x -= speed;
+            }
         }
 
         if (q_pressed)
         {
             background_x += speed;
-            Demon.x_Ennemie += speed;
+            for (int i = 0; i < MAX_DEMONS; i++)
+            {
+                horde[i].x += speed;
+            }
         }
 
         if (background_x <= -800)
@@ -171,7 +174,12 @@ int main(int argc, char *argv[])
         if (jump_direction == 1)
         {
             jump_offset += jump_speed;
-            Demon.y_Ennemie += jump_speed;
+
+            for (int i = 0; i < MAX_DEMONS; i++)
+            {
+                horde[i].y += jump_speed;
+            }
+
             if (jump_offset >= jump_height)
             {
                 jump_offset = jump_height;
@@ -181,27 +189,41 @@ int main(int argc, char *argv[])
         else if (jump_direction == -1)
         {
             jump_offset -= jump_speed;
-            Demon.y_Ennemie -= jump_speed;
+
+            for (int i = 0; i < MAX_DEMONS; i++)
+            {
+                horde[i].y -= jump_speed;
+            }
+
             if (jump_offset <= 0)
             {
                 jump_offset = 0;
-                Demon.y_Ennemie = 380;
+
                 jump_direction = 0;
+
+                for (int i = 0; i < MAX_DEMONS; i++)
+                {
+                    horde[i].y = horde[i].y_base;
+                }
             }
         }
 
         SDL_RenderClear(renderer);
         drawBackground(renderer, background_x, jump_offset);
         drawCharacter(renderer, WIDTH / 2, HEIGHT / 2, state, gauche);
-        //
-        drawDemon(renderer, Demon.x_Ennemie, Demon.y_Ennemie, state, PlayerIsLeft);
+        for (int i = 0; i < MAX_DEMONS; i++)
+        {
+            if (horde[i].exists)
+            {
+                drawDemon(renderer, &horde[i], horde[i].currentState);
+            }
+        }
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
 
     cleanupBackground();
     cleanupCharacter();
-    //
     cleanupDemon();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
