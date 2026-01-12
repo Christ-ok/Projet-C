@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
     const int speed = 5;
     int PlayerIsLeft = 0;
 
+    int Delay = 650;
+    int LastAttackTime = 0;
+
     Demon horde[MAX_DEMONS];
     Demon_spawn(&horde[0], 700, 400);
     Demon_spawn(&horde[1], 300, 200);
@@ -59,6 +62,8 @@ int main(int argc, char *argv[])
     while (running)
     {
         SDL_Event event;
+        Uint32 CurrentTime = SDL_GetTicks();
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
@@ -82,10 +87,17 @@ int main(int argc, char *argv[])
 
                 if (event.key.keysym.sym == SDLK_k)
                 {
-                    state = 2;
-                    for (int i = 0; i < MAX_DEMONS; i++)
+                    if (CurrentTime > LastAttackTime + Delay)
                     {
-                        Demon_takeDamage(&horde[1], 1);
+
+                        state = 2;
+
+                        for (int i = 0; i < MAX_DEMONS; i++)
+                        {
+                            Demon_takeDamage(&horde[i], 1);
+                        }
+
+                        LastAttackTime = CurrentTime;
                     }
                 }
 

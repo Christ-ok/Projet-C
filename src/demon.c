@@ -27,7 +27,7 @@ void Demon_spawn(Demon *d, int x, int y)
     d->x = x;
     d->y = y;
     d->y_base = y;
-    d->HP = 5;
+    d->HP = 8;
     d->dead = 0;
     d->exists = 1;
     d->currentState = 0;
