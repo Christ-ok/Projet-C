@@ -226,10 +226,19 @@ int main()
                         running = 0;
                 }
 
-                else if (state == MENU_JOUER && s == 2)
+                else if (state == MENU_JOUER)
                 {
-                    state = MENU_MAIN;
-                    currentMenu = mainMenu;
+                    if (s == 0) // NOUVELLE PARTIE
+                    {
+                        SDL_HideWindow(window); // Cache le menu
+                        system("game.exe");     // Lance l'exécutable du jeu
+                        SDL_ShowWindow(window); // Réaffiche le menu au retour
+                    }
+                    else if (s == 2) // RETOUR
+                    {
+                        state = MENU_MAIN;
+                        currentMenu = mainMenu;
+                    }
                 }
 
                 else if (state == MENU_PARAM)
