@@ -9,18 +9,7 @@ SDL_Texture *DeathDemon = NULL;
 
 int Demon_frameWidth = 79;
 int Demon_frameHeight = 69;
-int Demon_currentFrame = 0;
-Uint32 Demon_lastFrameTime = 0;
 const int Demon_frameTime = 120;
-
-int Demon_locked = 0;
-int Demon_currentState = 0;
-
-const int Demon_MaxPV = 5;
-int Demon_HP = Demon_MaxPV;
-int Demon_dead = 0;
-
-int Demon_exists = 1;
 
 void initDemon(SDL_Renderer *renderer)
 {
@@ -33,98 +22,113 @@ void initDemon(SDL_Renderer *renderer)
         SDL_Log("Erreur chargement textures demon");
 }
 
-void Demon_takeDamage(int damage)
+void Demon_spawn(Demon *d, int x, int y)
 {
-    if (Demon_exists == 0)
+    d->x = x;
+    d->y = y;
+    d->y_base = y;
+    d->HP = 8;
+    d->dead = 0;
+    d->exists = 1;
+    d->currentState = 0;
+    d->currentFrame = 0;
+    d->locked = 0;
+    d->lastFrameTime = SDL_GetTicks();
+    d->isLeft = 0;
+}
+
+void Demon_takeDamage(Demon *d, int damage)
+{
+    if (d->exists == 0)
         return;
 
-    Demon_HP -= damage;
+    d->HP -= damage;
 
-    if (Demon_HP <= 0)
+    if (d->HP <= 0)
     {
-        Demon_HP = 0;
-        Demon_dead = 1;
+        d->HP = 0;
+        d->dead = 1;
 
-        Demon_currentState = 7;
-        Demon_currentFrame = 0;
-        Demon_locked = 1;
+        d->currentState = 7;
+        d->currentFrame = 0;
+        d->locked = 1;
     }
     else
     {
-        Demon_currentState = 2;
-        Demon_currentFrame = 0;
-        Demon_locked = 1;
+        d->currentState = 2;
+        d->currentFrame = 0;
+        d->locked = 1;
     }
 }
 
-void drawDemon(SDL_Renderer *renderer, int x, int y, int state, int PlayerIsLeft)
+void drawDemon(SDL_Renderer *renderer, Demon *d, int state)
 {
-    if (Demon_exists == 0)
+    if (d->exists == 0)
         return;
 
-    SDL_RendererFlip Demon_flip = PlayerIsLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+    SDL_RendererFlip Demon_flip = d->isLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
     Uint32 Demon_now = SDL_GetTicks();
 
-    if (!Demon_locked)
+    if (!d->locked)
     {
-        if (state != Demon_currentState)
+        if (state != d->currentState)
         {
-            Demon_currentFrame = 0;
-            Demon_currentState = state;
+            d->currentFrame = 0;
+            d->currentState = state;
 
             if (state == 2 || state == 3 || state == 4 || state == 5)
             {
-                Demon_locked = 1;
+                d->locked = 1;
             }
         }
     }
 
-    if (Demon_now - Demon_lastFrameTime >= Demon_frameTime)
+    if (Demon_now - d->lastFrameTime >= Demon_frameTime)
     {
-        Demon_currentFrame++;
-        Demon_lastFrameTime = Demon_now;
+        d->currentFrame++;
+        d->lastFrameTime = Demon_now;
     }
 
     SDL_Texture *Demon_Animation = idleDemon;
     int Demon_maxFrames = 4;
 
-    if (Demon_currentState == 5)
+    if (d->currentState == 5)
     {
         Demon_Animation = attackDemon;
         Demon_maxFrames = 8;
     }
-    if (Demon_currentState == 2)
+    if (d->currentState == 2)
     {
         Demon_Animation = HurtDemon;
         Demon_maxFrames = 4;
     }
-    if (Demon_currentState == 7)
+    if (d->currentState == 7)
     {
         Demon_Animation = DeathDemon;
         Demon_maxFrames = 7;
     }
 
-    if (Demon_currentFrame >= Demon_maxFrames)
+    if (d->currentFrame >= Demon_maxFrames)
     {
 
-        if (Demon_currentState == 7)
+        if (d->currentState == 7)
         {
-            Demon_exists = 0;
+            d->exists = 0;
             return;
         }
 
-        Demon_currentFrame = 0;
+        d->currentFrame = 0;
 
-        if (Demon_locked)
+        if (d->locked)
         {
-            Demon_locked = 0;
-            Demon_currentState = 0;
+            d->locked = 0;
+            d->currentState = 0;
         }
     }
 
-    SDL_Rect Demon_src = {Demon_currentFrame * Demon_frameWidth, 0, Demon_frameWidth, Demon_frameHeight};
-    SDL_Rect Demon_dst = {x - Demon_frameWidth * -2, y - Demon_frameHeight * 1, Demon_frameWidth * 2, Demon_frameHeight * 2};
+    SDL_Rect Demon_src = {d->currentFrame * Demon_frameWidth, 0, Demon_frameWidth, Demon_frameHeight};
+    SDL_Rect Demon_dst = {d->x, d->y, Demon_frameWidth * 1.75, Demon_frameHeight * 1.75};
 
     SDL_RenderCopyEx(renderer, Demon_Animation, &Demon_src, &Demon_dst, 0, NULL, Demon_flip);
 }
