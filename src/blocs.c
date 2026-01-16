@@ -20,6 +20,8 @@ void initBloc(SDL_Renderer * renderer, Bloc *b){
     b->y = 500;
     b->w = blocWidth;
     b->h = blocHeight;
+    b->ground = 0;
+    b->transparant = 0;
 }
 
 
@@ -72,7 +74,7 @@ void drawBloc(SDL_Renderer *renderer, Bloc *tab, int nb_blocs, int camera_x){
 
 
 void applyGravity(Personnage *p){
-    const int gravity = 5;
+    const int gravity = 10;
 
     if (p->on_ground == 0)
     {
@@ -95,7 +97,7 @@ int verifyRectSuperposition(Personnage *p, Bloc *b, int jump_offset){
     int bloc_right = b->x + b->w;
 
     if (perso_y < bloc_bottom && perso_x > bloc_top)
-    {
+    {                            //perso_y > bloc_top)
         superposition = 1;
     } else {
         superposition = 0;
@@ -122,14 +124,6 @@ int verifyRectOnEmpty(Personnage *p, Bloc *b, int jump_offset){
         on_empty = 0;
     } else {
         on_empty = 1;
-        /*
-        if (on_empty == 1){
-            jump_direction = -1;
-            if (jump_direction == -1){
-                applyGravity(p);
-            }
-        }
-        */
     }
 
     return on_empty;

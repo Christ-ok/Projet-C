@@ -9,6 +9,8 @@ typedef struct{
     int y;
     int w;
     int h;
+    int ground;
+    int transparant;
 }Bloc;
 
 void initBloc(SDL_Renderer *renderer, Bloc *b);

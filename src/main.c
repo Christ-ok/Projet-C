@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
                 {
                     perso.state = 0;
                     space_pressed = 0;
+                    //jump_direction = 0;
                 }
 
                 if (event.key.keysym.sym == SDLK_t)
