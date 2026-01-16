@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
     Bloc level[200];
     generateLevel(level, 200, surface.w, surface.h);
 
+    
+
     SDL_bool running = SDL_TRUE; 
     int camera_x = 0;
     int camera_y = 0;
@@ -59,8 +61,6 @@ int main(int argc, char *argv[])
     const int jump_speed = 7;
     
     const int speed = 5;
-
-    
     
     while (running)
     {
@@ -134,18 +134,17 @@ int main(int argc, char *argv[])
                     perso.state = 0;
                 }
             }
-
-            
         }
 
         updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
 
-        jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed);
-        if (jump_direction == 0 && jump_offset == 0 && perso.state == 3)
-        {
-            perso.state = 0;
-        }
+        applyGravity(&perso);
+        
+        //jump_direction = -1;
+        checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
 
+        jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
+            
         cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
         
         SDL_RenderClear(renderer);

@@ -7,9 +7,17 @@
 #define HEIGHT 600
 #define SPEED 5
 
-void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_height, int jump_speed){
+void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_height, int jump_speed, int on_ground){
    
-    if (space_pressed && *jump_direction == 0) *jump_direction = 1;
+    if (space_pressed && *jump_direction == 0 && on_ground) *jump_direction = 1;
+
+    if (*jump_direction == -1 && on_ground == 1)
+    {
+        *jump_offset = 0;
+        *jump_direction = 0;
+        return;
+    }
+    
     
     if (*jump_direction == 1)
     {

@@ -31,14 +31,15 @@ void initCharacter(SDL_Renderer *renderer, Personnage *p)
     if (!idlePerso || !runPerso || !attackPerso || !JumpPerso || !DeathPerso)
         SDL_Log("Erreur chargement textures personnage");
 
-    p->x = 100;
+    p->x = 150;
     p->y = 300;
-    p->base_y = 300;
+    p->base_y = 500;
     p->w = 96;
     p->h = 84;
     p->speed = 10;
     p->state = 0;
     p->direction = 0;
+    p->on_ground = 1;
 }
 
 void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset)

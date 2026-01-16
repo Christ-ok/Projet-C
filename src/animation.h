@@ -6,12 +6,16 @@
 typedef struct{
     int x;
     int y;
-    int base_y;
+    float base_y;
     int w;
     int h;
     int speed;
     int state;
     int direction;
+    int jump_direction;
+    int jump_height;
+    int jump_speed;
+    int on_ground;
 }Personnage;
 
 void initCharacter(SDL_Renderer *renderer, Personnage *p);
