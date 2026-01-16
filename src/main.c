@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
     int LastAttackTime = 0;
 
     Demon horde[MAX_DEMONS];
+    Demon_spawn(&horde[1], 1000, 400);
     Demon_spawn(&horde[0], 700, 400);
-    Demon_spawn(&horde[1], 300, 200);
 
     while (running)
     {
@@ -116,11 +116,31 @@ int main(int argc, char *argv[])
 
                         state = 2;
                         perso.state = 2;
+                        
+                        for (int i = 0; i < MAX_DEMONS; i++)
+                        {
+                            
 
+                            if (perso.direction == 0 && horde[i].x_base - perso.x <= 270 && horde[i].x_base - perso.x >= 150){
+                                Demon_takeDamage(&horde[i], 1);
+                            }
+
+                            printf("Personnage : %d  Demon: %d\n", perso.x, horde[i].x_base);
+
+                            if (perso.direction == 1 && horde[i].x_base - perso.x >= 20 && horde[i].x_base - perso.x <= 150)
+                            {    
+                                Demon_takeDamage(&horde[i], 1);   
+                            }
+
+                        }
+
+                            
+                        /*
                         for (int i = 0; i < MAX_DEMONS; i++)
                         {
                             Demon_takeDamage(&horde[i], 1);
                         }
+                        */
 
                         LastAttackTime = CurrentTime;
                     }
@@ -162,7 +182,6 @@ int main(int argc, char *argv[])
                 {
                     perso.state = 0;
                     space_pressed = 0;
-                    //jump_direction = 0;
                 }
 
                 if (event.key.keysym.sym == SDLK_t)
@@ -173,6 +192,12 @@ int main(int argc, char *argv[])
         }
 
         updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
+
+        for (int i = 0; i < MAX_DEMONS; i++)
+        {
+            updateDemon(&horde[i], d_pressed, q_pressed, space_pressed, &camera_x, &camera_y, &perso);
+        }
+        
 
         applyGravity(&perso);
         
