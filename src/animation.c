@@ -17,7 +17,10 @@ const int frameTime = 120;
 int locked = 0;
 int currentState = 0;
 
-void initCharacter(SDL_Renderer *renderer)
+#define SCREENHEIGT 600
+
+
+void initCharacter(SDL_Renderer *renderer, Personnage *p)
 {
     idlePerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/IDLE.png");
     runPerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/RUN.png");
@@ -27,23 +30,33 @@ void initCharacter(SDL_Renderer *renderer)
 
     if (!idlePerso || !runPerso || !attackPerso || !JumpPerso || !DeathPerso)
         SDL_Log("Erreur chargement textures personnage");
+
+    p->x = 150;
+    p->y = 300;
+    p->base_y = 500;
+    p->w = 96;
+    p->h = 84;
+    p->speed = 10;
+    p->state = 0;
+    p->direction = 0;
+    p->on_ground = 1;
 }
 
-void drawCharacter(SDL_Renderer *renderer, int x, int y, int state, int gauche)
+void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset)
 {
 
-    SDL_RendererFlip flip = gauche ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+    SDL_RendererFlip flip = p->direction ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
     Uint32 now = SDL_GetTicks();
 
     if (!locked)
     {
-        if (state != currentState)
+        if (p->state != currentState)
         {
             currentFrame = 0;
-            currentState = state;
+            currentState = p->state;
 
-            if (state == 2 || state == 3 || state == 4)
+            if (p->state == 2 || p->state == 3 || p->state == 4)
             {
                 locked = 1;
             }
@@ -96,10 +109,18 @@ void drawCharacter(SDL_Renderer *renderer, int x, int y, int state, int gauche)
     }
 
     SDL_Rect src = {currentFrame * frameWidth, 0, frameWidth, frameHeight};
-    SDL_Rect dst = {x - frameWidth * 4, y - frameHeight / 6, frameWidth * 4, frameHeight * 4};
+    SDL_Rect dst = {p->x - camera_x, (p->base_y - jump_offset) - camera_y, frameWidth * 4, frameHeight * 4};
 
     SDL_RenderCopyEx(renderer, Animation, &src, &dst, 0, NULL, flip);
 }
+
+void updateCharacter(Personnage *p, int d_pressed, int q_pressed, int space_pressed, int camera_x){
+    if (d_pressed) p->x += p->speed;
+    if (q_pressed) p->x -= p->speed;
+
+    if (p->x < 0) p->x = camera_x;
+}
+
 
 void cleanupCharacter()
 {
@@ -114,3 +135,5 @@ void cleanupCharacter()
     if (DeathPerso)
         SDL_DestroyTexture(DeathPerso);
 }
+
+
