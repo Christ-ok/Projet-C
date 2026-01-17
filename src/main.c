@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 
 #include "background.h"
@@ -9,6 +10,7 @@
 #include "demon.h"
 #include "deplacement2.h"
 #include "blocs.h"
+#include "pause.h"
 
 Personnage perso;
 
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
     }
 
     SDL_Window *window = SDL_CreateWindow("BLADE QUEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
     initCharacter(renderer, &perso);
     initDemon(renderer);
@@ -89,6 +91,10 @@ int main(int argc, char *argv[])
 
             if (event.type == SDL_KEYDOWN && perso.alive == 1)
             {
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                        togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft);
+                }
                 if (event.key.keysym.sym == SDLK_d)
                 {
                     d_pressed = 1;
@@ -188,53 +194,62 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        if (!isGamePaused())
+       { 
+            updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
 
-        updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
-
-        for (int i = 0; i < MAX_DEMONS; i++)
-        {
-            updateDemon(&horde[i], d_pressed, q_pressed, space_pressed, &camera_x, &camera_y, &perso);
-
-            float same_y2 = perso.base_y + 90;
-
-            if (horde[i].x_base - perso.x == 150 && horde[i].exists == 1 && same_y2 <= horde[i].y_base + 5 && same_y2 >= horde[i].y_base - 5)
+            for (int i = 0; i < MAX_DEMONS; i++)
             {
-                Hero_takeDamage(&perso, 1);
+                updateDemon(&horde[i], d_pressed, q_pressed, space_pressed, &camera_x, &camera_y, &perso);
+
+                float same_y2 = perso.base_y + 90;
+
+                if (horde[i].x_base - perso.x == 150 && horde[i].exists == 1 && same_y2 <= horde[i].y_base + 5 && same_y2 >= horde[i].y_base - 5)
+                {
+                    Hero_takeDamage(&perso, 1);
+                }
             }
-        }
 
-        applyGravity(&perso);
+            applyGravity(&perso);
 
-        // jump_direction = -1;
-        checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
+            // jump_direction = -1;
+            checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
 
-        jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
+            jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
 
-        cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
+            cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
 
-        SDL_RenderClear(renderer);
-        drawBackground(renderer, camera_x, camera_y);
-        drawBloc(renderer, level, 200, camera_x);
-        drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
-
-        for (int i = 0; i < MAX_DEMONS; i++)
-        {
-            if (horde[i].exists)
+            SDL_RenderClear(renderer);
+            if (isGamePaused())
             {
-                drawDemon(renderer, &horde[i], horde[i].currentState);
+                renderPauseMenu(renderer, WIDTH, HEIGHT);
             }
-        }
+            else
+            {
+                drawBackground(renderer, camera_x, camera_y);
+                drawBloc(renderer, level, 200, camera_x);
+                drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
 
-        SDL_RenderPresent(renderer);
-        SDL_Delay(16);
+                for (int i = 0; i < MAX_DEMONS; i++)
+                {
+                    if (horde[i].exists)
+                    {
+                    drawDemon(renderer, &horde[i], horde[i].currentState);
+                    }
+                }
+            }
+            SDL_RenderPresent(renderer);
+            SDL_Delay(16);
+        }
     }
-
+    cleanupPause();
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 
     return 0;

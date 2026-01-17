@@ -228,13 +228,23 @@ int main()
 
                 else if (state == MENU_JOUER)
                 {
-                    if (s == 0) // NOUVELLE PARTIE
+                    if (s == 0) 
                     {
-                        SDL_HideWindow(window); // Cache le menu
-                        system("game.exe");     // Lance l'exécutable du jeu
-                        SDL_ShowWindow(window); // Réaffiche le menu au retour
+                        Mix_HaltMusic();
+                        SDL_HideWindow(window); 
+                        system("game.exe");     
+                        SDL_ShowWindow(window);
+                        if (bgm) Mix_PlayMusic(bgm, -1);
                     }
-                    else if (s == 2) // RETOUR
+                    else if (s == 1) 
+                    {
+                        Mix_HaltMusic();
+                        SDL_HideWindow(window);
+                        system("game.exe load"); 
+                        SDL_ShowWindow(window);
+                        if (bgm) Mix_PlayMusic(bgm, -1);
+                    }
+                    else if (s == 2) 
                     {
                         state = MENU_MAIN;
                         currentMenu = mainMenu;
