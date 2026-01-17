@@ -15,7 +15,7 @@ Personnage perso;
 #define WIDTH 800
 #define HEIGHT 600
 #define NB_BLOCS 10
-#define MAX_DEMONS 2
+#define MAX_DEMONS 7
 
 int main(int argc, char *argv[])
 {
@@ -69,8 +69,13 @@ int main(int argc, char *argv[])
     int LastAttackTime = 0;
 
     Demon horde[MAX_DEMONS];
-    Demon_spawn(&horde[1], 1000, 200);
     Demon_spawn(&horde[0], 700, 400);
+    Demon_spawn(&horde[1], 1000, 200);
+    Demon_spawn(&horde[2], 1200, 200);
+    Demon_spawn(&horde[3], 300, 200);
+    Demon_spawn(&horde[4], 1200, 400);
+    Demon_spawn(&horde[5], 1600, 200);
+    Demon_spawn(&horde[6], 1600, 400);
 
     while (running)
     {
@@ -82,7 +87,7 @@ int main(int argc, char *argv[])
             if (event.type == SDL_QUIT)
                 running = SDL_FALSE;
 
-            if (event.type == SDL_KEYDOWN /*&& perso.alive == 1*/)
+            if (event.type == SDL_KEYDOWN && perso.alive == 1)
             {
                 if (event.key.keysym.sym == SDLK_d)
                 {
