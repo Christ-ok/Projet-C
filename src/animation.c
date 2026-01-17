@@ -7,6 +7,7 @@ SDL_Texture *runPerso = NULL;
 SDL_Texture *attackPerso = NULL;
 SDL_Texture *JumpPerso = NULL;
 SDL_Texture *DeathPerso = NULL;
+SDL_Texture *HurtPerso = NULL;
 
 int frameWidth = 96;
 int frameHeight = 84;
@@ -19,7 +20,6 @@ int currentState = 0;
 
 #define SCREENHEIGT 600
 
-
 void initCharacter(SDL_Renderer *renderer, Personnage *p)
 {
     idlePerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/IDLE.png");
@@ -27,13 +27,17 @@ void initCharacter(SDL_Renderer *renderer, Personnage *p)
     attackPerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/ATTACK3.png");
     JumpPerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/JUMP.png");
     DeathPerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/DEATH.png");
+    HurtPerso = IMG_LoadTexture(renderer, "./assets/tiles/Characters/animation/HURT.png");
 
-    if (!idlePerso || !runPerso || !attackPerso || !JumpPerso || !DeathPerso)
+    if (!idlePerso || !runPerso || !attackPerso || !JumpPerso || !DeathPerso || !HurtPerso)
         SDL_Log("Erreur chargement textures personnage");
 
+    p->HP = 5;
+    p->alive = 1;
+    p->dead = 0;
     p->x = 150;
-    p->y = 300;
-    p->base_y = 500;
+    p->y = 200;
+    p->base_y = 200;
     p->w = 96;
     p->h = 84;
     p->speed = 10;
@@ -42,8 +46,38 @@ void initCharacter(SDL_Renderer *renderer, Personnage *p)
     p->on_ground = 1;
 }
 
+void Hero_takeDamage(Personnage *p, int damage)
+{
+
+    if (p->alive == 0)
+        return;
+
+    p->HP -= damage;
+
+    if (p->HP <= 0)
+    {
+        p->HP = 0;
+        p->alive = 0;
+
+        p->state = 4;
+        currentFrame = 0;
+        locked = 1;
+    }
+    else
+    {
+        currentState = 5;
+        currentFrame = 0;
+        locked = 1;
+    }
+}
+
 void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset)
 {
+    if (p->alive == 0)
+    {
+        currentFrame = 12;
+        return;
+    }
 
     SDL_RendererFlip flip = p->direction ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
@@ -92,6 +126,11 @@ void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int came
         Animation = DeathPerso;
         maxFrames = 12;
     }
+    if (currentState == 5)
+    {
+        Animation = HurtPerso;
+        maxFrames = 4;
+    }
 
     if (currentFrame >= maxFrames)
     {
@@ -114,13 +153,25 @@ void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int came
     SDL_RenderCopyEx(renderer, Animation, &src, &dst, 0, NULL, flip);
 }
 
-void updateCharacter(Personnage *p, int d_pressed, int q_pressed, int space_pressed, int camera_x){
-    if (d_pressed) p->x += p->speed;
-    if (q_pressed) p->x -= p->speed;
+void updateCharacter(Personnage *p, int d_pressed, int q_pressed, int space_pressed, int camera_x)
+{
+    if (p->alive == 0)
+    {
+        return;
+    }
+    if (d_pressed)
+        p->x += p->speed;
+    if (q_pressed)
+        p->x -= p->speed;
+    if (space_pressed == 1)
+        p->y += p->speed;
+    if (space_pressed == 0)
+    {
+    }
 
-    if (p->x < 0) p->x = camera_x;
+    if (p->x < 0)
+        p->x = camera_x;
 }
-
 
 void cleanupCharacter()
 {
@@ -134,6 +185,6 @@ void cleanupCharacter()
         SDL_DestroyTexture(JumpPerso);
     if (DeathPerso)
         SDL_DestroyTexture(DeathPerso);
+    if (HurtPerso)
+        SDL_DestroyTexture(HurtPerso);
 }
-
-
