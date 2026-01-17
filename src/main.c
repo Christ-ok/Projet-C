@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 
             float same_y2 = perso.base_y + 90;
 
-            if (horde[i].x_base - perso.x == 150 && same_y2 <= horde[i].y_base + 5 && same_y2 >= horde[i].y_base - 5)
+            if (horde[i].x_base - perso.x == 150 && horde[i].exists == 1 && same_y2 <= horde[i].y_base + 5 && same_y2 >= horde[i].y_base - 5)
             {
                 Hero_takeDamage(&perso, 1);
             }

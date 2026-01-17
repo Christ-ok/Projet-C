@@ -7,8 +7,8 @@
 #define SPEED 5
 
 SDL_Texture *bloc = NULL;
-int blocWidth = 100;
-int blocHeight = 100;
+int blocWidth = 0;
+int blocHeight = 0;
 
 void initBloc(SDL_Renderer * renderer, Bloc *b){
     bloc = IMG_LoadTexture(renderer, "assets/tiles/Backgrounds/tile_0013.png");
@@ -18,16 +18,16 @@ void initBloc(SDL_Renderer * renderer, Bloc *b){
 
     b->x = 500;
     b->y = 500;
-    b->w = blocWidth;
-    b->h = blocHeight;
+    b->w = blocWidth; //24
+    b->h = blocHeight; //24
     b->ground = 0;
     b->transparant = 0;
 }
 
 
 void initBlocArray(Bloc *tab, int nb_blocs, int blocWidth, int blocHeight){
-    int start_x = 600;
-    int start_y = 330;
+    int start_x = 300; //600
+    int start_y = 350; //330
     int spacing = blocWidth;
 
     for (int i = 0; i < nb_blocs; i++){
@@ -46,8 +46,8 @@ void generateLevel(Bloc *level, int total_blocs, int blocWidth, int blocHeight){
     int platform_length = 10;
     int gap = 200;
 
-    for (int i = 0; i < total_blocs; ){
-        for (int j = 0; j < platform_length && i < total_blocs; j++, i++){
+    for (int i = 0; i < total_blocs; i++){
+        for (int j = 0; j < platform_length && i < total_blocs; j++){
             level[i].x = current_x;
             level[i].y = current_y;
             level[i].w = blocWidth;
@@ -68,13 +68,13 @@ void drawBloc(SDL_Renderer *renderer, Bloc *tab, int nb_blocs, int camera_x){
     for (int i = 0; i < nb_blocs; i++)
     {
         SDL_Rect dst = {tab[i].x - camera_x, tab[i].y, tab[i].w, tab[i].h};
-        SDL_RenderCopy(renderer, bloc, &src, &dst);
+        SDL_RenderCopy(renderer, bloc, NULL, &dst);
     }
 }
 
 
 void applyGravity(Personnage *p){
-    const int gravity = 10;
+    const int gravity = 7;
 
     if (p->on_ground == 0)
     {
