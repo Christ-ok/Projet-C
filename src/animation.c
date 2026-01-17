@@ -58,8 +58,7 @@ void Hero_takeDamage(Personnage *p, int damage)
     {
         p->HP = 0;
         p->alive = 0;
-
-        p->state = 4;
+        currentState = 4;
         currentFrame = 0;
         locked = 1;
     }
@@ -73,11 +72,13 @@ void Hero_takeDamage(Personnage *p, int damage)
 
 void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset)
 {
+    /*
     if (p->alive == 0)
     {
         currentFrame = 12;
         return;
     }
+    */
 
     SDL_RendererFlip flip = p->direction ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
@@ -87,10 +88,16 @@ void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int came
     {
         if (p->state != currentState)
         {
+            if (p->state == 5)
+            {
+                locked = 1;
+                return;
+            }
+
             currentFrame = 0;
             currentState = p->state;
 
-            if (p->state == 2 || p->state == 3 || p->state == 4)
+            if (p->state == 2 || p->state == 3 || p->state == 4 || p->state == 5)
             {
                 locked = 1;
             }
@@ -134,15 +141,25 @@ void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int came
 
     if (currentFrame >= maxFrames)
     {
-        currentFrame = 0;
 
-        if (locked)
+        if (currentState == 4)
         {
-            locked = 0;
+            currentFrame = maxFrames - 1;
+        }
 
-            if (currentState != 1)
+        else
+        {
+
+            currentFrame = 0;
+
+            if (locked)
             {
-                currentState = 0;
+                locked = 0;
+
+                if (currentState != 1)
+                {
+                    currentState = 0;
+                }
             }
         }
     }

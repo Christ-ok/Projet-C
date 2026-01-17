@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
             if (event.type == SDL_QUIT)
                 running = SDL_FALSE;
 
-            if (event.type == SDL_KEYDOWN)
+            if (event.type == SDL_KEYDOWN /*&& perso.alive == 1*/)
             {
                 if (event.key.keysym.sym == SDLK_d)
                 {
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
                                 Demon_takeDamage(&horde[i], 1);
                             }
 
-                            printf("same_y : %2.f \npersonnage_y: %d\n base_y: %2.f \n Demon: %d \n\n", same_y, perso.y, perso.base_y, horde[i].y);
+                            printf("same_y : %2.f \npersonnage_x: %d\n demon_x: %d \n Demon_base_x: %d \n\n", same_y, perso.x, horde[i].x, horde[i].x_base);
 
                             if (perso.direction == 1 && horde[i].x_base - perso.x >= 20 && horde[i].x_base - perso.x <= 150 && same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5)
                             {
@@ -189,6 +189,13 @@ int main(int argc, char *argv[])
         for (int i = 0; i < MAX_DEMONS; i++)
         {
             updateDemon(&horde[i], d_pressed, q_pressed, space_pressed, &camera_x, &camera_y, &perso);
+
+            float same_y2 = perso.base_y + 90;
+
+            if (horde[i].x_base - perso.x == 150 && same_y2 <= horde[i].y_base + 5 && same_y2 >= horde[i].y_base - 5)
+            {
+                Hero_takeDamage(&perso, 1);
+            }
         }
 
         applyGravity(&perso);

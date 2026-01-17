@@ -3,9 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 
-
 #define WIDTH 800
-
 
 SDL_Texture *idleDemon = NULL;
 SDL_Texture *attackDemon = NULL;
@@ -42,9 +40,6 @@ void Demon_spawn(Demon *d, int x, int y)
     d->lastFrameTime = SDL_GetTicks();
     d->isLeft = 0;
 }
-
-
-
 
 void Demon_takeDamage(Demon *d, int damage)
 {
@@ -143,29 +138,30 @@ void drawDemon(SDL_Renderer *renderer, Demon *d, int state)
     SDL_RenderCopyEx(renderer, Demon_Animation, &Demon_src, &Demon_dst, 0, NULL, Demon_flip);
 }
 
+void updateDemon(Demon *d, int d_pressed, int q_pressed, int space_pressed, int *camera_x, int *camera_y, Personnage *p)
+{
 
-void updateDemon(Demon *d, int d_pressed, int q_pressed, int space_pressed, int *camera_x, int *camera_y, Personnage *p){
-    if (d_pressed) d->x -= p->speed;
-    if (q_pressed) d->x += p->speed;
+    if (p->alive == 0)
+        return;
+    if (d_pressed)
+        d->x -= p->speed;
+    if (q_pressed)
+        d->x += p->speed;
 
     *camera_x = p->x - WIDTH / 4;
-    if (*camera_x < 0) d->x = d->x_base;
-
+    if (*camera_x < 0)
+        d->x = d->x_base;
 
     /*
         void cameraY(int *camera_x, int *camera_y, Personnage *p, int jump_offset, int screen_width){
 
             *camera_x = p->x - WIDTH / 2;
             if (*camera_x < 0) *camera_x = 0;
-    
+
             *camera_y = (jump_offset / 2);
         }
     */
-
 }
-
-
-
 
 void cleanupDemon()
 {
