@@ -34,6 +34,11 @@ int main(int argc, char *argv[])
         SDL_Log("IMG_Init: %s", IMG_GetError());
         return -1;
     }
+    if (TTF_Init() == -1)
+    {
+        SDL_Log("TTF_Init: %s", TTF_GetError());
+        return -1;
+    }
 
     SDL_Window *window = SDL_CreateWindow("BLADE QUEST", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
@@ -125,7 +130,7 @@ int main(int argc, char *argv[])
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                        togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft, &perso, horde);
+                    togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft, &perso, horde);
                 }
                 if (event.key.keysym.sym == SDLK_d)
                 {
@@ -260,7 +265,8 @@ int main(int argc, char *argv[])
             jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
 
             cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
-
+       }
+       
             SDL_RenderClear(renderer);
             if (isGamePaused())
             {
@@ -282,7 +288,6 @@ int main(int argc, char *argv[])
             }
             SDL_RenderPresent(renderer);
             SDL_Delay(16);
-        }
     }
     cleanupPause();
     cleanupBackground();

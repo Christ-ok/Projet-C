@@ -56,10 +56,31 @@ void menu_free(Menu *m)
 
 void menu_layout(Menu *m, int winW, int winH, int startY)
 {
+    float scale = 1.0f;
+    if (winH < 800) {
+        scale = (float)winH / 800.0f;
+    }
+
+    int spacing = (int)(20 * scale);
+    int totalHeight = 0;
+
+    for (int i = 0; i < m->count; i++)
+    {
+        int w, h;
+        SDL_QueryTexture(m->items[i], NULL, NULL, &w, &h);
+        m->rects[i].w = (int)(w * scale);
+        m->rects[i].h = (int)(h * scale);
+        totalHeight += m->rects[i].h;
+    }
+    totalHeight += (m->count - 1) * spacing;
+
+    int currentY = (winH - totalHeight) / 2;
+
     for (int i = 0; i < m->count; i++)
     {
         m->rects[i].x = (winW - m->rects[i].w) / 2;
-        m->rects[i].y = startY + i * (m->rects[i].h + 24);
+        m->rects[i].y = currentY;
+        currentY += m->rects[i].h + spacing;
     }
 }
 
