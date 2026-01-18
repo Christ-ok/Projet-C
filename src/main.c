@@ -12,6 +12,7 @@
 #include "deplacement2.h"
 #include "blocs.h"
 #include "pause.h"
+#include "gameover.h"
 #include "save.h"
 
 Personnage perso;
@@ -122,7 +123,13 @@ int main(int argc, char *argv[])
                     printf("Partie sauvegardée depuis le pause!\n");
                 }
                 else if (buttonClicked == 2) {
-                    running = SDL_FALSE;
+                   running = SDL_FALSE;
+                }
+            }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN && perso.alive == 0) {
+                if (handleGameOverButtons(event.button.x, event.button.y, WIDTH, HEIGHT)) {
+                    running = SDL_FALSE;      
                 }
             }
 
@@ -285,11 +292,16 @@ int main(int argc, char *argv[])
                     drawDemon(renderer, &horde[i], horde[i].currentState);
                     }
                 }
+
+                if (perso.alive == 0) {
+                    GameOver(renderer, WIDTH, HEIGHT);
+                }
             }
             SDL_RenderPresent(renderer);
             SDL_Delay(16);
     }
     cleanupPause();
+    cleanupGameOver();
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();

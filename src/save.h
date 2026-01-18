@@ -9,8 +9,6 @@ typedef struct {
 } GameState;
 
 int save_game(const char *filename, GameState *state);
-
-
 int load_game(const char *filename, GameState *state);
 
 #endif
