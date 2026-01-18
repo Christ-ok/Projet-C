@@ -278,14 +278,21 @@ int main(int argc, char *argv[])
             drawBackground(renderer, camera_x, camera_y);
             drawBloc(renderer, level, 200, camera_x);
             drawDemonStat(renderer);
+            drawCoeurStat(renderer);
             drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
             stat(renderer, demonCount);
+            statCoeur(renderer, &perso);
 
             for (int i = 0; i < MAX_DEMONS; i++)
             {
                 if (horde[i].exists)
                 {
                     drawDemon(renderer, &horde[i], horde[i].currentState);
+                }
+                if (!horde[i].wascounted && !horde[i].exists)
+                {
+                    demonCount++;
+                    horde[i].wascounted = 1;
                 }
             }
         }
@@ -298,6 +305,7 @@ int main(int argc, char *argv[])
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();
+    cleanUpImageHP();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();

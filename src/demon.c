@@ -31,7 +31,7 @@ void Demon_spawn(Demon *d, int x, int y)
     d->y = y;
     d->y_base = y;
     d->x_base = x;
-    d->HP = 8;
+    d->HP = 2;
     d->dead = 0;
     d->exists = 1;
     d->currentState = 0;
@@ -39,6 +39,7 @@ void Demon_spawn(Demon *d, int x, int y)
     d->locked = 0;
     d->lastFrameTime = SDL_GetTicks();
     d->isLeft = 0;
+    d->wascounted = 0;
 }
 
 void Demon_takeDamage(Demon *d, int damage)
