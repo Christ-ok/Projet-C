@@ -4,14 +4,13 @@
 int save_game(const char *filename, GameState *state) {
     FILE *f = fopen(filename, "wb");
     if (!f) {
-        perror("Erreur");
+        perror("Erreur de sauvegarde");
         return 0;
     }
     
-    size_t written = fwrite(state, sizeof(GameState), 1, f);
+    fwrite(state, sizeof(GameState), 1, f);
     fclose(f);
-    
-    return (written == 1);
+    return 1;
 }
 
 int load_game(const char *filename, GameState *state) {
@@ -20,8 +19,7 @@ int load_game(const char *filename, GameState *state) {
         return 0;
     }
     
-    size_t read = fread(state, sizeof(GameState), 1, f);
+    fread(state, sizeof(GameState), 1, f);
     fclose(f);
-    
-    return (read == 1);
+    return 1;
 }

@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "background.h"
 #include "animation.h"
@@ -11,6 +12,7 @@
 #include "deplacement2.h"
 #include "blocs.h"
 #include "pause.h"
+#include "save.h"
 
 Personnage perso;
 
@@ -79,6 +81,18 @@ int main(int argc, char *argv[])
     Demon_spawn(&horde[5], 1600, 200);
     Demon_spawn(&horde[6], 1600, 400);
 
+    GameState game_state;
+
+    if (argc > 1 && strcmp(argv[1], "load") == 0) {
+        if (load_game("savegame.dat", &game_state)) {
+            perso.x = game_state.player_x;
+            perso.y = game_state.player_y;
+            perso.HP = game_state.player_hp;
+            camera_x = game_state.camera_x;
+            printf("Partie chargée depuis le menu!\n");
+        }
+    }
+
     while (running)
     {
         SDL_Event event;
@@ -89,11 +103,29 @@ int main(int argc, char *argv[])
             if (event.type == SDL_QUIT)
                 running = SDL_FALSE;
 
+            if (event.type == SDL_MOUSEBUTTONDOWN && isGamePaused()) {
+                PauseButtons pauseButtons = {{WIDTH / 2 - 80, HEIGHT / 2 - 20, 160, 40}, 
+                                            {WIDTH / 2 - 80, HEIGHT / 2 + 40, 160, 40}};
+                int buttonClicked = handlePauseButtons(event.button.x, event.button.y, &pauseButtons);
+                
+                if (buttonClicked == 1) {
+                    game_state.player_x = perso.x;
+                    game_state.player_y = perso.y;
+                    game_state.player_hp = perso.HP;
+                    game_state.camera_x = camera_x;
+                    save_game("savegame.dat", &game_state);
+                    printf("Partie sauvegardée depuis le pause!\n");
+                }
+                else if (buttonClicked == 2) {
+                    running = SDL_FALSE;
+                }
+            }
+
             if (event.type == SDL_KEYDOWN && perso.alive == 1)
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                        togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft);
+                        togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft, &perso, horde);
                 }
                 if (event.key.keysym.sym == SDLK_d)
                 {
@@ -160,6 +192,16 @@ int main(int argc, char *argv[])
                 if (event.key.keysym.sym == SDLK_t)
                 {
                     Hero_takeDamage(&perso, 1);
+                }
+
+                if (event.key.keysym.sym == SDLK_s)
+                {
+                    game_state.player_x = perso.x;
+                    game_state.player_y = perso.y;
+                    game_state.player_hp = perso.HP;
+                    game_state.camera_x = camera_x;
+                    
+                    save_game("savegame.dat", &game_state);
                 }
             }
 
