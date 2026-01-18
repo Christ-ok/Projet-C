@@ -8,7 +8,6 @@
 #include "background.h"
 #include "animation.h"
 #include "stat.h"
-#include "deplacement.h"
 #include "demon.h"
 #include "deplacement2.h"
 #include "blocs.h"
