@@ -7,6 +7,7 @@
 
 #include "background.h"
 #include "animation.h"
+#include "stat.h"
 #include "deplacement.h"
 #include "demon.h"
 #include "deplacement2.h"
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
     initCharacter(renderer, &perso);
+    initImageDemon(renderer);
     initDemon(renderer);
     initBackground(renderer);
 
@@ -65,6 +67,8 @@ int main(int argc, char *argv[])
     int d_pressed = 0;
     int q_pressed = 0;
     int space_pressed = 0;
+
+    int demonCount = 0;
 
     int jump_offset = 0;
     int jump_direction = 0;
@@ -88,8 +92,10 @@ int main(int argc, char *argv[])
 
     GameState game_state;
 
-    if (argc > 1 && strcmp(argv[1], "load") == 0) {
-        if (load_game("savegame.dat", &game_state)) {
+    if (argc > 1 && strcmp(argv[1], "load") == 0)
+    {
+        if (load_game("savegame.dat", &game_state))
+        {
             perso.x = game_state.player_x;
             perso.y = game_state.player_y;
             perso.HP = game_state.player_hp;
@@ -108,12 +114,14 @@ int main(int argc, char *argv[])
             if (event.type == SDL_QUIT)
                 running = SDL_FALSE;
 
-            if (event.type == SDL_MOUSEBUTTONDOWN && isGamePaused()) {
-                PauseButtons pauseButtons = {{WIDTH / 2 - 80, HEIGHT / 2 - 20, 160, 40}, 
-                                            {WIDTH / 2 - 80, HEIGHT / 2 + 40, 160, 40}};
+            if (event.type == SDL_MOUSEBUTTONDOWN && isGamePaused())
+            {
+                PauseButtons pauseButtons = {{WIDTH / 2 - 80, HEIGHT / 2 - 20, 160, 40},
+                                             {WIDTH / 2 - 80, HEIGHT / 2 + 40, 160, 40}};
                 int buttonClicked = handlePauseButtons(event.button.x, event.button.y, &pauseButtons);
-                
-                if (buttonClicked == 1) {
+
+                if (buttonClicked == 1)
+                {
                     game_state.player_x = perso.x;
                     game_state.player_y = perso.y;
                     game_state.player_hp = perso.HP;
@@ -121,7 +129,8 @@ int main(int argc, char *argv[])
                     save_game("savegame.dat", &game_state);
                     printf("Partie sauvegardée depuis le pause!\n");
                 }
-                else if (buttonClicked == 2) {
+                else if (buttonClicked == 2)
+                {
                     running = SDL_FALSE;
                 }
             }
@@ -176,13 +185,6 @@ int main(int argc, char *argv[])
                             }
                         }
 
-                        /*
-                        for (int i = 0; i < MAX_DEMONS; i++)
-                        {
-                            Demon_takeDamage(&horde[i], 1);
-                        }
-                        */
-
                         LastAttackTime = CurrentTime;
                     }
                 }
@@ -205,7 +207,7 @@ int main(int argc, char *argv[])
                     game_state.player_y = perso.y;
                     game_state.player_hp = perso.HP;
                     game_state.camera_x = camera_x;
-                    
+
                     save_game("savegame.dat", &game_state);
                 }
             }
@@ -242,7 +244,7 @@ int main(int argc, char *argv[])
             }
         }
         if (!isGamePaused())
-       { 
+        {
             updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
 
             for (int i = 0; i < MAX_DEMONS; i++)
@@ -259,37 +261,40 @@ int main(int argc, char *argv[])
 
             applyGravity(&perso);
 
-            // jump_direction = -1;
             checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
 
             jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
 
             cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
-       }
-       
-            SDL_RenderClear(renderer);
-            if (isGamePaused())
-            {
-                renderPauseMenu(renderer, WIDTH, HEIGHT);
-            }
-            else
-            {
-                drawBackground(renderer, camera_x, camera_y);
-                drawBloc(renderer, level, 200, camera_x);
-                drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
+        }
 
-                for (int i = 0; i < MAX_DEMONS; i++)
+        SDL_RenderClear(renderer);
+        if (isGamePaused())
+        {
+            renderPauseMenu(renderer, WIDTH, HEIGHT);
+        }
+        else
+        {
+            drawBackground(renderer, camera_x, camera_y);
+            drawBloc(renderer, level, 200, camera_x);
+            drawDemonStat(renderer);
+            drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
+            stat(renderer, demonCount);
+
+            for (int i = 0; i < MAX_DEMONS; i++)
+            {
+                if (horde[i].exists)
                 {
-                    if (horde[i].exists)
-                    {
                     drawDemon(renderer, &horde[i], horde[i].currentState);
-                    }
                 }
             }
-            SDL_RenderPresent(renderer);
-            SDL_Delay(16);
+        }
+        SDL_RenderPresent(renderer);
+        SDL_Delay(16);
     }
+
     cleanupPause();
+    cleanUpImageDemon();
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();
