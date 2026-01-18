@@ -31,7 +31,7 @@ void Demon_spawn(Demon *d, int x, int y)
     d->y = y;
     d->y_base = y;
     d->x_base = x;
-    d->HP = 8;
+    d->HP = 2;
     d->dead = 0;
     d->exists = 1;
     d->currentState = 0;
@@ -39,6 +39,7 @@ void Demon_spawn(Demon *d, int x, int y)
     d->locked = 0;
     d->lastFrameTime = SDL_GetTicks();
     d->isLeft = 0;
+    d->wascounted = 0;
 }
 
 void Demon_takeDamage(Demon *d, int damage)
@@ -151,16 +152,6 @@ void updateDemon(Demon *d, int d_pressed, int q_pressed, int space_pressed, int 
     *camera_x = p->x - WIDTH / 4;
     if (*camera_x < 0)
         d->x = d->x_base;
-
-    /*
-        void cameraY(int *camera_x, int *camera_y, Personnage *p, int jump_offset, int screen_width){
-
-            *camera_x = p->x - WIDTH / 2;
-            if (*camera_x < 0) *camera_x = 0;
-
-            *camera_y = (jump_offset / 2);
-        }
-    */
 }
 
 void cleanupDemon()

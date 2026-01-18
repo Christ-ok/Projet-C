@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include "animation.h"
 
-
 typedef struct
 {
     int x, y;
@@ -13,16 +12,15 @@ typedef struct
     int HP;
     int dead;
     int exists;
-
+    int wascounted;
     int currentState;
     int currentFrame;
     int locked;
     Uint32 lastFrameTime;
 
-    //int statePosition
+    // int statePosition
     int isLeft;
 } Demon;
-
 
 /*
     void (Demon *d, d_pressed){
