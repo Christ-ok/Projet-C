@@ -21,7 +21,7 @@ Personnage perso;
 #define WIDTH 800
 #define HEIGHT 600
 #define NB_BLOCS 10
-#define MAX_DEMONS 7
+#define MAX_DEMONS 10
 
 int main(int argc, char *argv[])
 {
@@ -93,13 +93,16 @@ int main(int argc, char *argv[])
     int LastAttackTime = 0;
 
     Demon horde[MAX_DEMONS];
-    Demon_spawn(&horde[0], 700, 400);
+    Demon_spawn(&horde[0], 1450, 400);
     Demon_spawn(&horde[1], 1000, 200);
     Demon_spawn(&horde[2], 1200, 200);
-    Demon_spawn(&horde[3], 300, 200);
+    Demon_spawn(&horde[3], 2000, 200);
     Demon_spawn(&horde[4], 1200, 400);
     Demon_spawn(&horde[5], 1600, 200);
-    Demon_spawn(&horde[6], 1600, 400);
+    Demon_spawn(&horde[6], 2100, 400);
+    Demon_spawn(&horde[7], 2700, 400);
+    Demon_spawn(&horde[8], 1800, 200);
+    Demon_spawn(&horde[9], 2200, 200);
 
     GameState game_state;
 
@@ -140,20 +143,17 @@ int main(int argc, char *argv[])
                     save_game("savegame.dat", &game_state);
                     printf("Partie sauvegardée depuis le pause!\n");
                 }
-<<<<<<< HEAD
-                else if (buttonClicked == 2) {
-                   running = SDL_FALSE;
-                }
-            }
-
-            if (event.type == SDL_MOUSEBUTTONDOWN && perso.alive == 0) {
-                if (handleGameOverButtons(event.button.x, event.button.y, WIDTH, HEIGHT)) {
-                    running = SDL_FALSE;      
-=======
                 else if (buttonClicked == 2)
                 {
                     running = SDL_FALSE;
->>>>>>> score
+                }
+            }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN && perso.alive == 0)
+            {
+                if (handleGameOverButtons(event.button.x, event.button.y, WIDTH, HEIGHT))
+                {
+                    running = SDL_FALSE;
                 }
             }
 
@@ -317,7 +317,12 @@ int main(int argc, char *argv[])
                     horde[i].wascounted = 1;
                 }
 
-                if (perso.alive == 0) {
+                if (perso.alive == 0)
+                {
+                    GameOver(renderer, WIDTH, HEIGHT);
+                }
+                if (demonCount == 10)
+                {
                     GameFinished(renderer, WIDTH, HEIGHT);
                 }
             }
@@ -327,11 +332,8 @@ int main(int argc, char *argv[])
     }
 
     cleanupPause();
-<<<<<<< HEAD
     cleanupGameOver();
-=======
     cleanUpImageDemon();
->>>>>>> score
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();
