@@ -25,7 +25,7 @@ Personnage perso;
 int main(int argc, char *argv[])
 {
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
     {
         SDL_Log("SDL_Init: %s", SDL_GetError());
         return -1;
@@ -38,6 +38,16 @@ int main(int argc, char *argv[])
     if (TTF_Init() == -1)
     {
         SDL_Log("TTF_Init: %s", TTF_GetError());
+        return -1;
+    }
+    if ((Mix_Init(MIX_INIT_OGG) & MIX_INIT_OGG) != MIX_INIT_OGG)
+    {
+        SDL_Log("Mix_Init: %s", Mix_GetError());
+        return -1;
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        SDL_Log("Mix_OpenAudio: %s", Mix_GetError());
         return -1;
     }
 
@@ -294,7 +304,7 @@ int main(int argc, char *argv[])
                 }
 
                 if (perso.alive == 0) {
-                    GameOver(renderer, WIDTH, HEIGHT);
+                    GameFinished(renderer, WIDTH, HEIGHT);
                 }
             }
             SDL_RenderPresent(renderer);
@@ -309,6 +319,7 @@ int main(int argc, char *argv[])
     SDL_DestroyWindow(window);
     IMG_Quit();
     TTF_Quit();
+    Mix_Quit();
     SDL_Quit();
 
     return 0;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 static TTF_Font *gameOverFont = NULL;
+static Mix_Music *winMusic = NULL;
 
 void GameOver(SDL_Renderer *renderer, int width, int height) {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -58,6 +59,10 @@ void cleanupGameOver() {
         TTF_CloseFont(gameOverFont);
         gameOverFont = NULL;
     }
+    if (winMusic) {
+        Mix_FreeMusic(winMusic);
+        winMusic = NULL;
+    }
 }
 
 void GameFinished(SDL_Renderer *renderer, int width, int height) {
@@ -66,10 +71,6 @@ void GameFinished(SDL_Renderer *renderer, int width, int height) {
     SDL_Rect overlay = {0, 0, width, height};
     SDL_RenderFillRect(renderer, &overlay);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-    SDL_Init(SDL_INIT_AUDIO);
-    Mix_Init(MIX_INIT_OGG);
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
-    Mix_AllocateChannels(16);
 
     if (!gameOverFont) {
         gameOverFont = TTF_OpenFont("assets/fonts/Titre_menu.ttf", 48);
@@ -102,15 +103,12 @@ void GameFinished(SDL_Renderer *renderer, int width, int height) {
             SDL_FreeSurface(textSurface);
             }
         }    
-    Mix_Music *winsound = Mix_LoadMUS("assets/audio/win_sound.ogg");
-    if (winsound)
-    {
-        Mix_VolumeMusic((10 * MIX_MAX_VOLUME) / 100);
-        Mix_PlayMusic(winsound, -1);
+    
+    if (!winMusic) {
+        winMusic = Mix_LoadMUS("assets/audio/win_sound.ogg");
+        if (winMusic) {
+            Mix_VolumeMusic((10 * MIX_MAX_VOLUME) / 100);
+            Mix_PlayMusic(winMusic, 0);
+        }
     }
-
-    if (winsound)
-        Mix_FreeMusic(winsound);
-    Mix_CloseAudio();
-    Mix_Quit();
 }
