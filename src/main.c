@@ -3,9 +3,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
-
 #include "background.h"
 #include "animation.h"
+#include "plateforme.h"
 #include "deplacement.h"
 #include "demon.h"
 #include "deplacement2.h"
@@ -17,7 +17,8 @@ Personnage perso;
 #define WIDTH 800
 #define HEIGHT 600
 #define NB_BLOCS 10
-#define MAX_DEMONS 7
+#define MAX_DEMONS 2
+#define MAX_PLATEFORMES 4
 
 int main(int argc, char *argv[])
 {
@@ -39,15 +40,17 @@ int main(int argc, char *argv[])
     initCharacter(renderer, &perso);
     initDemon(renderer);
     initBackground(renderer);
+    initPlateformeTexture(renderer);
 
+    /*
     Bloc surface;
     initBloc(renderer, &surface);
 
     Bloc tab[NB_BLOCS];
     initBlocArray(tab, NB_BLOCS, surface.w, surface.h);
-
     Bloc level[200];
     generateLevel(level, 200, surface.w, surface.h);
+    */
 
     SDL_bool running = SDL_TRUE;
     int camera_x = 0;
@@ -73,16 +76,24 @@ int main(int argc, char *argv[])
     Demon horde[MAX_DEMONS];
     Demon_spawn(&horde[0], 700, 400);
     Demon_spawn(&horde[1], 1000, 200);
-    Demon_spawn(&horde[2], 1200, 200);
+    /*Demon_spawn(&horde[2], 1200, 200);
     Demon_spawn(&horde[3], 300, 200);
     Demon_spawn(&horde[4], 1200, 400);
     Demon_spawn(&horde[5], 1600, 200);
-    Demon_spawn(&horde[6], 1600, 400);
+    Demon_spawn(&horde[6], 1600, 400);*/
+
+    Plateforme plateformes[MAX_PLATEFORMES];
+    spawn_Plateforme(&plateformes[0], 800, 400, 3, 1);
+    spawn_Plateforme(&plateformes[1], 600, 400, 3, 1);
+    spawn_Plateforme(&plateformes[2], 400, 400, 3, 1);
+    spawn_Plateforme(&plateformes[3], 200, 400, 3, 1);
 
     while (running)
     {
         SDL_Event event;
         Uint32 CurrentTime = SDL_GetTicks();
+
+        printf("y : %d \nbase_y: %2.f\n jump_y: %2.f\n\n", perso.y, perso.base_y, perso.base_y - jump_offset);
 
         while (SDL_PollEvent(&event))
         {
@@ -93,7 +104,7 @@ int main(int argc, char *argv[])
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
-                        togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft);
+                    togglePause(renderer, WIDTH, HEIGHT, camera_x, camera_y, jump_offset, state, gauche, PlayerIsLeft);
                 }
                 if (event.key.keysym.sym == SDLK_d)
                 {
@@ -126,14 +137,14 @@ int main(int argc, char *argv[])
                         for (int i = 0; i < MAX_DEMONS; i++)
                         {
 
-                            if (perso.direction == 0 && horde[i].x_base - perso.x <= 270 && horde[i].x_base - perso.x >= 150 && same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5)
+                            if (perso.direction == 0 && horde[i].x_base - perso.x <= 270 && horde[i].x_base - perso.x >= 150 /*&& same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5*/)
                             {
                                 Demon_takeDamage(&horde[i], 1);
                             }
 
-                            printf("same_y : %2.f \npersonnage_x: %d\n demon_x: %d \n Demon_base_x: %d \n\n", same_y, perso.x, horde[i].x, horde[i].x_base);
+                            printf("personnage_y : %d \npersonnage_x: %d\n demon_x: %d \n Demon_base_x: %d \n\n", perso.y, perso.x, horde[i].x, horde[i].x_base);
 
-                            if (perso.direction == 1 && horde[i].x_base - perso.x >= 20 && horde[i].x_base - perso.x <= 150 && same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5)
+                            if (perso.direction == 1 && horde[i].x_base - perso.x >= 20 && horde[i].x_base - perso.x <= 150 /*&& same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5*/)
                             {
                                 Demon_takeDamage(&horde[i], 1);
                             }
@@ -195,7 +206,7 @@ int main(int argc, char *argv[])
             }
         }
         if (!isGamePaused())
-       { 
+        {
             updateCharacter(&perso, d_pressed, q_pressed, space_pressed, camera_x);
 
             for (int i = 0; i < MAX_DEMONS; i++)
@@ -210,12 +221,14 @@ int main(int argc, char *argv[])
                 }
             }
 
-            applyGravity(&perso);
+            /* applyGravity(&perso); */
 
             // jump_direction = -1;
-            checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
+            // checkCollisionWithBlocs(level, 200, &perso, jump_offset, &jump_direction);
 
-            jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground);
+            jumpY(space_pressed, &jump_direction, &jump_offset, jump_height, jump_speed, perso.on_ground, &perso);
+
+            checkCollisionWithPlateform(NULL, &perso, jump_offset, &jump_direction);
 
             cameraY(&camera_x, &camera_y, &perso, jump_offset, WIDTH);
 
@@ -227,15 +240,19 @@ int main(int argc, char *argv[])
             else
             {
                 drawBackground(renderer, camera_x, camera_y);
-                drawBloc(renderer, level, 200, camera_x);
+                /* drawBloc(renderer, level, 200, camera_x);*/
                 drawCharacter(renderer, &perso, camera_x, camera_y, jump_offset);
 
                 for (int i = 0; i < MAX_DEMONS; i++)
                 {
                     if (horde[i].exists)
                     {
-                    drawDemon(renderer, &horde[i], horde[i].currentState);
+                        drawDemon(renderer, &horde[i], horde[i].currentState);
                     }
+                }
+                for (int i = 0; i < MAX_PLATEFORMES; i++)
+                {
+                    Plateforme_draw(renderer, &plateformes[i], camera_x);
                 }
             }
             SDL_RenderPresent(renderer);
@@ -243,6 +260,7 @@ int main(int argc, char *argv[])
         }
     }
     cleanupPause();
+    cleanUpPlateforme();
     cleanupBackground();
     cleanupCharacter();
     cleanupDemon();

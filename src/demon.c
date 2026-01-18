@@ -151,16 +151,6 @@ void updateDemon(Demon *d, int d_pressed, int q_pressed, int space_pressed, int 
     *camera_x = p->x - WIDTH / 4;
     if (*camera_x < 0)
         d->x = d->x_base;
-
-    /*
-        void cameraY(int *camera_x, int *camera_y, Personnage *p, int jump_offset, int screen_width){
-
-            *camera_x = p->x - WIDTH / 2;
-            if (*camera_x < 0) *camera_x = 0;
-
-            *camera_y = (jump_offset / 2);
-        }
-    */
 }
 
 void cleanupDemon()

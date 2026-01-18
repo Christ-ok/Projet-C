@@ -37,7 +37,7 @@ void initCharacter(SDL_Renderer *renderer, Personnage *p)
     p->dead = 0;
     p->x = 150;
     p->y = 200;
-    p->base_y = 200;
+    p->base_y = 300;
     p->w = 96;
     p->h = 84;
     p->speed = 10;
@@ -180,11 +180,6 @@ void updateCharacter(Personnage *p, int d_pressed, int q_pressed, int space_pres
         p->x += p->speed;
     if (q_pressed)
         p->x -= p->speed;
-    if (space_pressed == 1)
-        p->y += p->speed;
-    if (space_pressed == 0)
-    {
-    }
 
     if (p->x < 0)
         p->x = camera_x;

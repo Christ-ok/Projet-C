@@ -7,9 +7,12 @@
 #define HEIGHT 600
 #define SPEED 5
 
-void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_height, int jump_speed, int on_ground){
-   
-    if (space_pressed && *jump_direction == 0 && on_ground) *jump_direction = 1;
+const int back = 200;
+void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_height, int jump_speed, int on_ground, Personnage *p)
+{
+
+    if (space_pressed && *jump_direction == 0 && on_ground)
+        *jump_direction = 1;
 
     if (*jump_direction == -1 && on_ground == 1)
     {
@@ -17,20 +20,23 @@ void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_he
         *jump_direction = 0;
         return;
     }
-    
-    
+
     if (*jump_direction == 1)
     {
         *jump_offset += jump_speed;
+        p->y += jump_speed;
+
         if (*jump_offset >= jump_height)
         {
             *jump_offset = jump_height;
+            p->y = jump_height;
             *jump_direction = -1;
         }
-
-
-    } else if (*jump_direction == -1){
+    }
+    else if (*jump_direction == -1)
+    {
         *jump_offset -= jump_speed;
+        p->y -= jump_speed;
         if (*jump_offset <= 0)
         {
             *jump_offset = 0;
@@ -39,12 +45,12 @@ void jumpY(int space_pressed, int *jump_direction, int *jump_offset, int jump_he
     }
 }
 
-void cameraY(int *camera_x, int *camera_y, Personnage *p, int jump_offset, int screen_width){
+void cameraY(int *camera_x, int *camera_y, Personnage *p, int jump_offset, int screen_width)
+{
 
     *camera_x = p->x - WIDTH / 4;
-    if (*camera_x < 0) *camera_x = 0;
-    
+    if (*camera_x < 0)
+        *camera_x = 0;
+
     *camera_y = (jump_offset / 2);
-
 }
-
