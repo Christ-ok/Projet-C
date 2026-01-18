@@ -18,16 +18,16 @@ void initBloc(SDL_Renderer * renderer, Bloc *b){
 
     b->x = 500;
     b->y = 500;
-    b->w = blocWidth; //24
-    b->h = blocHeight; //24
+    b->w = blocWidth; 
+    b->h = blocHeight; 
     b->ground = 0;
     b->transparant = 0;
 }
 
 
 void initBlocArray(Bloc *tab, int nb_blocs, int blocWidth, int blocHeight){
-    int start_x = 300; //600
-    int start_y = 350; //330
+    int start_x = 300; 
+    int start_y = 350; 
     int spacing = blocWidth;
 
     for (int i = 0; i < nb_blocs; i++){
@@ -97,7 +97,7 @@ int verifyRectSuperposition(Personnage *p, Bloc *b, int jump_offset){
     int bloc_right = b->x + b->w;
 
     if (perso_y < bloc_bottom && perso_x > bloc_top)
-    {                            //perso_y > bloc_top)
+    {                            
         superposition = 1;
     } else {
         superposition = 0;
@@ -106,7 +106,7 @@ int verifyRectSuperposition(Personnage *p, Bloc *b, int jump_offset){
     return superposition;
 }
 
-//Si ça ne marche pas je vais essayer de faire la fonction en int avec un return 
+
 int verifyRectOnEmpty(Personnage *p, Bloc *b, int jump_offset){
     int on_empty;
 

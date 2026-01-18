@@ -157,6 +157,14 @@ int main(int argc, char *argv[])
                 }
             }
 
+            if (event.type == SDL_MOUSEBUTTONDOWN && demonCount == 10)
+            {
+                if (handleGameOverButtons(event.button.x, event.button.y, WIDTH, HEIGHT))
+                {
+                    running = SDL_FALSE;
+                }
+            }
+
             if (event.type == SDL_KEYDOWN && perso.alive == 1)
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
@@ -198,8 +206,6 @@ int main(int argc, char *argv[])
                             {
                                 Demon_takeDamage(&horde[i], 1);
                             }
-
-                            printf("same_y : %2.f \npersonnage_x: %d\n demon_x: %d \n Demon_base_x: %d \n\n", same_y, perso.x, horde[i].x, horde[i].x_base);
 
                             if (perso.direction == 1 && horde[i].x_base - perso.x >= 20 && horde[i].x_base - perso.x <= 150 && same_y <= horde[i].y_base + 5 && same_y >= horde[i].y_base - 5)
                             {
@@ -348,5 +354,5 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-// Code pour lancer le projet : gcc src/*.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o projet_c
-// gcc src/animation.c src/deplacement.c src/background.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o proj
+// Code pour lancer le projet :
+//gcc src/main.c src/background.c src/animation.c src/demon.c src/stat.c src/deplacement.c src/deplacement2.c src/pause.c src/save.c src/gameover.c src/blocs.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o game.exe ; gcc src/menu_opti.c -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -o menu.exe

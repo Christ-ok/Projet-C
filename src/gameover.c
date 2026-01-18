@@ -54,6 +54,7 @@ int handleGameOverButtons(int mouseX, int mouseY, int width, int height) {
     return 0;
 }
 
+
 void cleanupGameOver() {
     if (gameOverFont) {
         TTF_CloseFont(gameOverFont);

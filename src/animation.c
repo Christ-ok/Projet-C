@@ -72,14 +72,6 @@ void Hero_takeDamage(Personnage *p, int damage)
 
 void drawCharacter(SDL_Renderer *renderer, Personnage *p, int camera_x, int camera_y, int jump_offset)
 {
-    /*
-    if (p->alive == 0)
-    {
-        currentFrame = 12;
-        return;
-    }
-    */
-
     SDL_RendererFlip flip = p->direction ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
     Uint32 now = SDL_GetTicks();

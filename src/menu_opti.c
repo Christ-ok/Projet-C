@@ -297,7 +297,7 @@ int main()
                     {
                         SDL_SetWindowFullscreen(window, 0);
                         SDL_SetWindowSize(window, preset[s][0], preset[s][1]);
-                        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);//la fenetre est centrer comme ca arnaud sera content avec son cul plein de merde
+                        SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
                         save_config(vol, preset[s][0], preset[s][1]);
                     }
                     else if (s == 4)

@@ -17,22 +17,8 @@ typedef struct
     int currentFrame;
     int locked;
     Uint32 lastFrameTime;
-
-    // int statePosition
     int isLeft;
 } Demon;
-
-/*
-    void (Demon *d, d_pressed){
-        const int deplacer = d->statePosition; 15
-
-        if (d_pressed){
-            d->statePosition = deplacer; 15
-        }
-
-    }
-
-*/
 
 void initDemon(SDL_Renderer *renderer);
 void Demon_spawn(Demon *d, int x, int y);
